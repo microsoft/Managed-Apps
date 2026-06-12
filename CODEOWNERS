@@ -1,0 +1,10 @@
+# CODEOWNERS for microsoft/Managed-Apps
+#
+# These owners are automatically requested for review on pull requests that
+# touch matching files. See:
+# https://docs.github.com/articles/about-code-owners
+#
+# Order matters: the last matching pattern takes precedence.
+
+# Default owners for everything in the repo.
+* @pavankm @Chamu-Rajasekera

@@ -21,6 +21,8 @@ See the [Quickstart - CLI](https://go.microsoft.com/fwlink/?LinkId=2368962) to s
 ## Repository structure
 
 - [`templates/`](templates/) — first-party project templates (currently [`vite8`](templates/vite8), a React + TypeScript + Vite 8 starter).
+- [`plugins/`](plugins/) — the [`microsoft-managed-apps`](plugins/microsoft-managed-apps) plugin: skills, agents, and hooks for building Microsoft Managed Apps with AI coding agents (works with Claude Code and GitHub Copilot).
+- [`.claude-plugin/`](.claude-plugin/) — marketplace manifest (`marketplace.json`) that registers the plugin so agents can install it via `/plugin marketplace add`.
 
 ## Documentation
 
