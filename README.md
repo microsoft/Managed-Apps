@@ -3,7 +3,7 @@
 > [!NOTE]
 > Microsoft Managed Apps is in **public preview**. APIs, templates, and tooling may change before general availability.
 
-Microsoft Managed Apps let you build custom web applications using standard web technologies — React, TypeScript, and Vite.
+Microsoft Managed Apps lets you build custom web applications using standard web technologies — React, TypeScript, and Vite.
 <!-- TODO: confirm the official one-line product description before publishing. -->
 
 This repository hosts the official first-party project **templates** and is the home for **public issues**. The tooling itself ships as npm packages under the `@microsoft/managed-apps` scope:
