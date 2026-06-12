@@ -3,18 +3,18 @@
 > [!NOTE]
 > Microsoft Managed Apps is in **public preview**. APIs, templates, and tooling may change before general availability.
 
-Microsoft Managed Apps let you build custom web applications with standard web technologies — React, TypeScript, and Vite — and run them as managed apps on the Microsoft Power Platform.
+Microsoft Managed Apps let you build custom web applications using standard web technologies — React, TypeScript, and Vite.
 <!-- TODO: confirm the official one-line product description before publishing. -->
 
 This repository hosts the official first-party project **templates** and is the home for **public issues and feature requests**. The tooling itself ships as npm packages under the `@microsoft/managed-apps` scope:
 
 | Package | Description |
 | --- | --- |
-| [`@microsoft/managed-apps`](https://www.npmjs.com/package/@microsoft/managed-apps) | Power Apps SDK |
+| [`@microsoft/managed-apps`](https://www.npmjs.com/package/@microsoft/managed-apps) | SDK for building Microsoft Apps |
 | [`@microsoft/managed-apps-cli`](https://www.npmjs.com/package/@microsoft/managed-apps-cli) | Command-line interface for building and managing Microsoft Apps |
 | [`@microsoft/managed-apps-vite-plugin`](https://www.npmjs.com/package/@microsoft/managed-apps-vite-plugin) | Vite plugin for Microsoft Apps |
 | [`@microsoft/managed-apps-common`](https://www.npmjs.com/package/@microsoft/managed-apps-common) | Shared types, utilities, and services |
-| [`@microsoft/managed-apps-codegen`](https://www.npmjs.com/package/@microsoft/managed-apps-codegen) | Code generation for Power Apps code apps |
+| [`@microsoft/managed-apps-codegen`](https://www.npmjs.com/package/@microsoft/managed-apps-codegen) | Code generation for Microsoft Apps |
 | [`@microsoft/managed-apps-actions`](https://www.npmjs.com/package/@microsoft/managed-apps-actions) | Developer actions for data sources, code generation, and app publishing |
 
 ## Getting started
