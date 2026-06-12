@@ -16,7 +16,7 @@ This repository hosts the official first-party project **templates** and is the 
 
 ## Getting started
 
-TODO: link to learn docs "getting started page"
+See the [getting started guide](https://go.microsoft.com/fwlink/?LinkId=2369054) to set up your environment and build your first app.
 
 ## Repository structure
 
@@ -24,9 +24,7 @@ TODO: link to learn docs "getting started page"
 
 ## Documentation
 
-TODO: link to learn docs
-
-Documentation is being published alongside the preview. In the meantime, see each package's README on npm.
+See the [Microsoft Managed Apps documentation](https://go.microsoft.com/fwlink/?LinkId=2369054).
 
 ## Support
 
