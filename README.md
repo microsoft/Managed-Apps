@@ -16,7 +16,7 @@ This repository hosts the official first-party project **templates** and is the 
 
 ## Getting started
 
-See the [getting started guide](https://go.microsoft.com/fwlink/?LinkId=2369054) to set up your environment and build your first app.
+See the [Quickstart - CLI](https://go.microsoft.com/fwlink/?LinkId=2368962) to set up your environment and build your first app.
 
 ## Repository structure
 
