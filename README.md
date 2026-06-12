@@ -6,7 +6,7 @@
 Microsoft Managed Apps let you build custom web applications using standard web technologies — React, TypeScript, and Vite.
 <!-- TODO: confirm the official one-line product description before publishing. -->
 
-This repository hosts the official first-party project **templates** and is the home for **public issues and feature requests**. The tooling itself ships as npm packages under the `@microsoft/managed-apps` scope:
+This repository hosts the official first-party project **templates** and is the home for **public issues**. The tooling itself ships as npm packages under the `@microsoft/managed-apps` scope:
 
 | Package | Description |
 | --- | --- |
@@ -28,7 +28,7 @@ See the [Microsoft Managed Apps documentation](https://go.microsoft.com/fwlink/?
 
 ## Support
 
-This project uses GitHub Issues to track bugs and feature requests. Please search existing issues before filing a new one to avoid duplicates. For a new bug or feature request, open an issue in this repository. See [SUPPORT.md](SUPPORT.md) for details.
+This project uses GitHub Issues to track bugs. Please search existing issues before filing a new one to avoid duplicates. For a new bug, open an issue in this repository. See [SUPPORT.md](SUPPORT.md) for details.
 
 ## Contributing
 
