@@ -10,12 +10,9 @@ This repository hosts the official first-party project **templates** and is the 
 
 | Package | Description |
 | --- | --- |
-| [`@microsoft/managed-apps`](https://www.npmjs.com/package/@microsoft/managed-apps) | SDK for building Microsoft Apps |
-| [`@microsoft/managed-apps-cli`](https://www.npmjs.com/package/@microsoft/managed-apps-cli) | Command-line interface for building and managing Microsoft Apps |
-| [`@microsoft/managed-apps-vite-plugin`](https://www.npmjs.com/package/@microsoft/managed-apps-vite-plugin) | Vite plugin for Microsoft Apps |
-| [`@microsoft/managed-apps-common`](https://www.npmjs.com/package/@microsoft/managed-apps-common) | Shared types, utilities, and services |
-| [`@microsoft/managed-apps-codegen`](https://www.npmjs.com/package/@microsoft/managed-apps-codegen) | Code generation for Microsoft Apps |
-| [`@microsoft/managed-apps-actions`](https://www.npmjs.com/package/@microsoft/managed-apps-actions) | Developer actions for data sources, code generation, and app publishing |
+| [`@microsoft/managed-apps`](https://www.npmjs.com/package/@microsoft/managed-apps) | SDK for building Microsoft Managed Apps |
+| [`@microsoft/managed-apps-cli`](https://www.npmjs.com/package/@microsoft/managed-apps-cli) | Command-line interface for building and managing Microsoft Managed Apps |
+| [`@microsoft/managed-apps-vite-plugin`](https://www.npmjs.com/package/@microsoft/managed-apps-vite-plugin) | Vite plugin for Microsoft Managed Apps |
 
 ## Getting started
 
