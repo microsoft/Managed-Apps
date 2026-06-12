@@ -1,24 +1,36 @@
-# Project
+# Microsoft Managed Apps
 
-> This repo has been populated by an initial template to help get you started. Please
-> make sure to update the content to build a great experience for community-building.
+> [!NOTE]
+> Microsoft Managed Apps is in **public preview**. APIs, templates, and tooling may change before general availability.
 
-As the maintainer of this project, please make a few updates:
+Microsoft Managed Apps lets you build custom web applications using standard web technologies — React, TypeScript, and Vite.
+<!-- TODO: confirm the official one-line product description before publishing. -->
 
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
+This repository hosts the official first-party project **templates** and is the home for **public issues**. The tooling itself ships as npm packages under the `@microsoft/managed-apps` scope:
+
+| Package | Description |
+| --- | --- |
+| [`@microsoft/managed-apps`](https://www.npmjs.com/package/@microsoft/managed-apps) | SDK for building Microsoft Managed Apps |
+| [`@microsoft/managed-apps-cli`](https://www.npmjs.com/package/@microsoft/managed-apps-cli) | Command-line interface for building and managing Microsoft Managed Apps |
+| [`@microsoft/managed-apps-vite-plugin`](https://www.npmjs.com/package/@microsoft/managed-apps-vite-plugin) | Vite plugin for Microsoft Managed Apps |
+
+## Getting started
+
+See the [Quickstart - CLI](https://go.microsoft.com/fwlink/?LinkId=2368962) to set up your local dev environment and build your first app.
+
+## Repository structure
+
+- [`templates/`](templates/) — first-party project templates (currently [`vite8`](templates/vite8), a React + TypeScript + Vite 8 starter).
+
+## Documentation
+
+See the [Microsoft Managed Apps documentation](https://go.microsoft.com/fwlink/?LinkId=2369054).
+
+## Support
+
+This project uses GitHub Issues to track bugs. Please search existing issues before filing a new one to avoid duplicates. For a new bug, open an issue in this repository. See [SUPPORT.md](SUPPORT.md) for details.
 
 ## Contributing
-
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit [Contributor License Agreements](https://cla.opensource.microsoft.com).
-
-When you submit a pull request, a CLA bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
