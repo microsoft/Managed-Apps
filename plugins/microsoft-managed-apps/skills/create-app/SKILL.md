@@ -1,0 +1,332 @@
+---
+name: create-app
+description: Creates Microsoft Apps using React and Vite. Use when scaffolding a new app with `ms app create` and ending on local dev with `ms app dev`.
+user-invocable: true
+allowed-tools: Read, Edit, Write, Grep, Glob, Bash, AskUserQuestion, EnterPlanMode, ExitPlanMode, Skill
+model: opus
+---
+
+**📋 Shared Instructions: [shared-instructions.md](${CLAUDE_PLUGIN_ROOT}/shared/shared-instructions.md)** — Cross-cutting concerns.
+
+**References:**
+
+- [prerequisites-reference.md](./references/prerequisites-reference.md) — Node, git, CLI install, allowedPrompts.
+- [troubleshooting.md](./references/troubleshooting.md) — First-run Git Credential Manager trap, common `ms app create` failures.
+
+# Create a Microsoft App
+
+This skill scaffolds a new Microsoft App end-to-end using `@microsoft/managed-apps-cli` (binary `ms`). The default outcome is a **running local dev server**, not a deployed cloud app. Deploying is a separate, explicit user choice via `/deploy`.
+
+## Workflow
+
+1. Memory Bank → 2. Prerequisites → 3. Gather Requirements → 4. Plan → 5. Auth → 6. Environment → 7. Scaffold → 8. Add Data Sources → 9. Implement App → 10. Local Dev → 11. Summary → 12. Memory Bank Update
+
+**Critical principle:** when this skill ends and the user opens the local URL, they must see a **functional app** — connectors wired, screens implemented per the approved plan — not a bare template. Adding data sources and implementing the UI happen **inside this skill**, before `ms app dev` is started. Do not defer them to "next steps."
+
+---
+
+### Step 1: Check Memory Bank
+
+Check for `memory-bank.md` per [shared-instructions.md](${CLAUDE_PLUGIN_ROOT}/shared/shared-instructions.md). If found, ask the user whether they want to resume (e.g., re-run `ms app dev` against an existing scaffold) or start a new app.
+
+### Step 2: Validate Prerequisites
+
+Run prerequisite checks **first** — no point gathering requirements if the environment isn't ready. Full details in [prerequisites-reference.md](./references/prerequisites-reference.md).
+
+```bash
+node --version                                                    # Must be v22+
+git --version                                                     # Required (used by `ms app create` to init the repo)
+ms --version 2>/dev/null  # Probe the bin name
+```
+
+- **Missing Node.js or below v22**: Report "Node.js 22+ is required. Install from https://nodejs.org/ or switch with `nvm use 22`." STOP.
+- **Missing Git**: Report "Git is required — `ms app create` initializes a repo. Install from https://git-scm.com/." STOP.
+- **Missing `ms`**: proceed to the global install block below. Confirm with the user before running `npm install -g`.
+- **One of them resolves**: record which binary name resolved (`$BIN`); use it in every subsequent step.
+
+#### Global install of `@microsoft/managed-apps-cli` (only if `ms` is missing)
+
+Install the CLI **globally** from the public npm registry so the `ms` binary is on PATH.
+
+Ask the user: _"This will install `@microsoft/managed-apps-cli@latest` globally on your machine. OK to proceed?"_ Wait for explicit yes.
+
+Then run:
+
+```bash
+# Install globally, pinned to the @latest stable tag.
+npm install -g @microsoft/managed-apps-cli@latest
+
+# Re-probe the bin name.
+ms --version
+```
+
+Record the resolved bin name as `$BIN`.
+
+#### Daily `@latest` refresh check
+
+If `ms` was already installed, compare the local version to the latest published version and offer to upgrade (the `@latest` tag updates regularly):
+
+```bash
+INSTALLED=$( ($BIN --version 2>/dev/null) | tr -d '\r' )
+LATEST=$(npm view @microsoft/managed-apps-cli@latest version 2>/dev/null | tr -d '\r')
+
+if [ -n "$LATEST" ] && [ "$INSTALLED" != "$LATEST" ]; then
+  echo "Installed: $INSTALLED — latest: $LATEST — upgrade recommended."
+fi
+```
+
+Ask before running the upgrade. Don't auto-update without consent.
+
+### Step 3: Gather Requirements
+
+**Skip questions the user already answered in their initial prompt.**
+
+If the user has not described what they want to build (i.e., `/create-app` was invoked with no arguments or a vague prompt), start with a single open-ended question:
+
+> "What would you like to build? Describe it in your own words — what it does, who uses it, and what problem it solves."
+
+Wait for their answer. Use it to frame all follow-up questions. Do NOT present a multiple-choice list of app types before the user has described their idea.
+
+Once you have their description:
+
+1. **Confirm the app name.** Use `--display-name` (free-form, can contain spaces).
+2. **Ask about data.** Focus on what the app needs to do, not specific technologies:
+   - "What data does your app need to work with?"
+   - "Does it need to search existing information, manage its own data, or both?"
+   - Based on the answers, identify the connector(s) and the matching `/add-*` skill (or `/add-connector` with an api-id) that will be invoked in Step 8. Capture **all** info those skills will need (connection IDs, table/list names, api-id, environment URL, etc.) — you will run them yourself, not hand them off.
+3. **Ask about UI:** key screens, layout, interactions, theme preference. Capture enough detail to actually generate the components in Step 9.
+4. Resolve all ambiguity now — easier than re-planning mid-scaffold. The user should approve the plan once and not be asked to approve sub-steps later.
+
+### Step 4: Plan
+
+1. Enter plan mode with `EnterPlanMode`.
+2. Design the **complete** implementation approach the user will approve in one shot:
+   - Display name (let the CLI resolve the environment automatically; only pass `--environment-id` if the user explicitly provided one).
+   - **Each data source to be added** (which `/add-*` skill, api-id, table/list/connection identifiers). These are invoked by Step 8 of this skill — list them as concrete steps, not as "next steps."
+   - **App architecture**: components, pages, routing, state management — enough detail that Step 9 can generate the code without re-asking.
+   - Build/verify steps and the final `ms app dev` hand-off.
+3. Present the plan for approval, including `allowedPrompts` from [prerequisites-reference.md](./references/prerequisites-reference.md). Be explicit: _"On approval, I'll scaffold, add the connectors, implement the UI, build, and start local dev. You won't be asked to confirm again until everything is running."_
+4. Exit plan mode with `ExitPlanMode` when approved.
+
+### Step 5: Auth
+
+```bash
+$BIN auth status
+```
+
+- **Active UPN is correct**: proceed.
+- **Wrong UPN**: ask the user whether to keep it or switch. To switch:
+  ```bash
+  $BIN auth login   # interactive browser flow
+  ```
+- **Not signed in**: run `$BIN auth login` (interactive).
+
+Treat `auth status` output as the source of truth on every invocation — never assume a cached session is the right account.
+
+### Step 6: Environment
+
+By default, run `ms app create` with **no** environment flags and let the CLI resolve everything automatically. Do not surface the environment concept to the user.
+
+The only exception: **if the user explicitly provides an environment ID, pass it through** as `ms app create --environment-id <env-id>`. Never discover, infer, or construct an environment ID yourself — if the user hasn't given you one, don't pass the flag.
+
+If environment routing fails, surface the actual error to the user rather than attempting an environment workaround (see [troubleshooting.md](./references/troubleshooting.md)).
+
+### Step 7: Scaffold
+
+Use the **current working directory** as the project root. Do not create or switch to a separate directory inside this skill.
+
+Before running `ms app create`, verify the current folder is empty (ignore hidden VCS/system files like `.git`, `.DS_Store`, `Thumbs.db`, `.vscode`). If it is not empty, ask the user whether to continue in a different empty folder and STOP until they confirm.
+
+```bash
+PROJECT_ROOT="$(pwd)"
+
+# Current folder must be empty for first scaffold (ignoring common hidden/system files).
+if find "$PROJECT_ROOT" -mindepth 1 -maxdepth 1 \
+  ! -name '.git' \
+  ! -name '.DS_Store' \
+  ! -name 'Thumbs.db' \
+  ! -name '.vscode' \
+  | grep -q .; then
+  echo "Current directory is not empty. Please run /create-app from an empty folder."
+  exit 1
+fi
+```
+
+```bash
+$BIN app create \
+  --display-name "$DISPLAY_NAME" \
+  --non-interactive
+# Append --environment-id "$ENV_ID" ONLY if the user explicitly provided an environment ID (see Step 6).
+```
+
+Capture from the output: the app GUID, the environment ID/name resolved by the CLI, and the remote git URL. (The environment ID appears in the App Player URL and is needed for that link — it's an internal detail, not something to surface to the user.)
+
+#### First-run Git Credential Manager trap
+
+On the **first ever** `ms app create` for a fresh account (or after the GCM cache expires for the relevant remote), the local-setup step fails with:
+
+```
+fatal: Authentication failed for 'https://<env-id>.d.environment.api.powerplatform.com/appframework/git/repositories/<repo-guid>/'
+App '<name>' was created, but local setup failed: Command failed: git fetch origin
+```
+
+The CLI installed a `[credential ...]` block in `.git/config` but GCM still needs an interactive browser flow once.
+
+**Recovery sequence** (the app exists in the service but is empty locally):
+
+Before running recovery, ask for explicit user confirmation because this sequence deletes files in the current project folder and recreates it.
+
+```bash
+cd "$PROJECT_ROOT"
+git fetch origin                                                 # browser opens; approve.
+# Set APP_ID to the created app GUID from the create output (or `ms app list --json`) before delete.
+$BIN app delete --app "$APP_ID" --force --non-interactive       # remove the half-formed app
+[ -n "$APP_ID" ] && [ -n "$PROJECT_ROOT" ] || { echo "Missing APP_ID or PROJECT_ROOT; refusing cleanup."; exit 1; }
+# Guardrail: never allow cleanup when project root is home or filesystem root.
+[ "$PROJECT_ROOT" != "$HOME" ] && [ "$PROJECT_ROOT" != "/" ] || { echo "Refusing cleanup at unsafe path: $PROJECT_ROOT"; exit 1; }
+find "$PROJECT_ROOT" -mindepth 1 -maxdepth 1 \
+  ! -name '.git' \
+  ! -name '.DS_Store' \
+  ! -name 'Thumbs.db' \
+  ! -name '.vscode' \
+  -exec rm -rf {} +                                              # clean project contents, preserve folder
+cd "$PROJECT_ROOT"
+# Re-run `ms app create` — auth is now cached, second run completes end-to-end.
+```
+
+Detect the trap by matching `Authentication failed for 'https://...d.environment.api...'` in the create output. Surface the suspected trap and proposed recovery, then wait for explicit user approval before running the destructive cleanup steps.
+
+### Step 8: Add Data Sources
+
+For every connector identified in Step 3 / Step 4, invoke the matching skill **now**, in this session, before any UI code is generated:
+
+- A specific `/add-*` skill when one exists (`/add-dataverse`, `/add-sharepoint`, `/add-excel`, `/add-office365`, `/add-teams`, `/add-onedrive`, `/add-azuredevops`, `/add-mcscopilot`, `/add-procedure`).
+- `/add-connector` (with api-id) for anything else.
+
+Run them sequentially. After each one:
+
+- Confirm the typed services were generated under `src/` (the add-skills regenerate TypeScript clients).
+- Capture the connection ID + service path so Step 9 can import them.
+
+**Forward all captured context to each sub-skill so its own gather-info prompts are suppressed.** The per-service skills (`/add-dataverse`, `/add-sharepoint`, etc.) and `/add-connector` each have their own prompt sequences (pick connection, pick table/list/site, choose api-id, etc.). The plan you got the user to approve in Step 4 already contains those answers, so pass them through as `$ARGUMENTS` (or whatever invocation surface is available) when dispatching: api-id, connection ID or name, table/list/site identifiers, environment URL, and the project root. If a sub-skill still needs an input you didn't capture, that's a Step 4 gap — go back and ask the user once, then update the plan, rather than letting the sub-skill ask interactively.
+
+The intent of this step is no per-connector approval prompts: the approved plan from Step 4 covers them. If a sub-skill fails (auth, missing connection, wrong api-id), surface the error verbatim and stop; do not silently proceed with a half-wired app.
+
+If Step 3 / Step 4 identified zero data sources, skip this step. Otherwise, this step must complete before Step 9 starts.
+
+### Step 9: Implement the App
+
+Generate the code that delivers the experience described in the approved plan:
+
+- Components, pages, routing, state management.
+- Wire each component to the typed services produced in Step 8 (no raw `fetch` / `axios` / Graph calls — see [shared-instructions.md](${CLAUDE_PLUGIN_ROOT}/shared/shared-instructions.md)).
+- Apply the theme/UI preferences captured in Step 3.
+- Replace template placeholder content; the user must see *their* app at the local URL, not "Hello World."
+
+When the implementation is complete, the next step's `npm run build` is the gate that proves everything compiles end-to-end.
+
+### Step 10: Build and start local dev
+
+```bash
+npm install            # safe to re-run; idempotent.
+npm run build          # verifies the scaffolded + connector + custom code all compile.
+$BIN app dev           # starts the dev server (default port 8080) + config server.
+```
+
+If `npm run build` fails, fix the errors before running `ms app dev`. Don't hand the user a URL that points at a broken build.
+
+`ms app dev` runs two servers and prints an App Player URL like:
+
+```
+Ready. You can play your app locally at: https://apps.powerapps.com/play/e/<env-id>/app/<app-id>?...
+```
+
+Hand that URL to the user **as a markdown link** (`[Open app in browser](<url>)`). The raw URL is long enough to be truncated by most terminals; markdown link form keeps it clickable and copyable. **Nothing has been deployed to the cloud at this point** — the app exists in the service catalog but its runtime is local, with the connectors and UI you just built wired up.
+
+The dev server runs in the foreground. Either:
+- Keep it running and tell the user how to stop it (Ctrl+C) and restart (`ms app dev`).
+- Or, if the user wants to continue iterating in the same Claude/Copilot session, run `ms app dev` in the background (`run_in_background: true`) and monitor for the App Player URL line.
+
+### Step 11: Summary
+
+Provide:
+
+- **App**: display name, app GUID, version `v1.0.0`.
+- **Project path**: `$PROJECT_ROOT`.
+- **Remote git URL**.
+- **Connectors wired up**: list each one added in Step 8 + which screens use it.
+- **App Player URL** (local dev) as a markdown link.
+- **What this URL is**: a live preview of the running app. Edits made in this chat will hot-reload there in real time — the user does **not** need to restart anything to see changes.
+- **Next steps** (in this exact framing):
+  1. Tell me what to change — I'll edit the code and you'll see it update live in the browser.
+  2. When you're happy with how it looks and behaves, say so. I'll commit + push your changes, run `ms app play --mode preview` to give you a cloud preview URL hosted in your environment, and *then* ask if you want me to `/deploy` to the live URL.
+- **Important**: explicitly note that **nothing has been deployed to the cloud yet** — current state is local dev only.
+
+When the user signals readiness, follow the **Ready-to-Ship Gate** in [shared-instructions.md](${CLAUDE_PLUGIN_ROOT}/shared/shared-instructions.md) — commit, push, `ms app play --mode preview`, hand off the preview URL, then ask about `/deploy`. Do not skip the preview gate.
+
+Do **not** list `/add-*` skills as next steps here; data sources were already wired in Step 8. (If the user later wants an additional connector, they can ask and you'll invoke the right `/add-*` mid-iteration.)
+
+### Step 12: Update Memory Bank
+
+Write `memory-bank.md` at `$PROJECT_ROOT/memory-bank.md` per [memory-bank.md](${CLAUDE_PLUGIN_ROOT}/shared/memory-bank.md) template. Record the environment ID the CLI resolved for reference (e.g. to reconstruct the App Player URL) — do not use it to re-target a future `ms app create`, and do not surface it to the user.
+
+---
+
+## Example Walkthrough
+
+**User request:**
+
+> "Build me a hello-world Microsoft App called Sample One."
+
+**Commands run (in order, against an account with `ms` already installed and authenticated to the production cluster):**
+
+```bash
+# Step 2: Prerequisites
+node --version                       # → v22.4.0
+git --version                        # → 2.45.0
+ms --version                         # → 0.3.x
+
+# Step 5: Auth
+ms auth status                       # → signed in as alice@contoso.onmicrosoft.com
+
+# Step 7: Scaffold (run from an empty current folder)
+pwd                                 # → /Users/alice/work/sample_one
+ms app create \
+  --display-name "Sample One" \
+  --non-interactive
+# → App created. AppId: 7ea6...
+# → Environment: Default-<guid> (auto-routed)
+# → Remote: https://<env-id>.d.environment.api.powerplatform.com/...
+
+# Step 8: Add Data Sources (none in this hello-world example — skipped)
+
+# Step 9: Implement App (template-only for hello-world; nothing to wire)
+
+# Step 10: Build and start local dev
+npm install
+npm run build
+ms app dev
+# → Ready. Play locally at: https://apps.powerapps.com/play/e/<env-id>/app/7ea6...
+```
+
+**Final summary (verbatim format):**
+
+```
+Sample One is running locally.
+
+App: Sample One v1.0.0
+App GUID: 7ea6...
+Environment: Default-<guid> (auto-routed Developer environment)
+Cluster: prod
+Project: /Users/alice/work/sample_one
+Remote: https://<env-id>.d.environment.api.powerplatform.com/...
+Local URL: [Open app in browser](https://apps.powerapps.com/play/e/<env-id>/app/7ea6...?...)
+
+Nothing has been deployed to the cloud. The app (with its connectors and UI
+already wired up) runs from your machine via `ms app dev`. The browser tab
+hot-reloads as I make code changes — just tell me what to adjust.
+
+When you're happy with it, tell me. I'll commit + push your changes, run
+`ms app play --mode preview` to give you a cloud preview URL in your
+environment, and then ask if you want me to /deploy.
+```

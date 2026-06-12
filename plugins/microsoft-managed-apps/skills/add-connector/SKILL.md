@@ -1,0 +1,131 @@
+---
+name: add-connector
+description: Canonical add flow for Microsoft Managed Apps. Use when adding any connector through `ms app add action`, `ms app add table`, or `ms app add procedure`, or when the user wants help discovering which connector / api-id to use.
+user-invocable: true
+allowed-tools: Read, Edit, Write, Grep, Glob, Bash, AskUserQuestion, Skill
+model: sonnet
+---
+
+**📋 Shared Instructions: [shared-instructions.md](${CLAUDE_PLUGIN_ROOT}/shared/shared-instructions.md)** — Cross-cutting concerns.
+
+**Reference:** [connector-reference.md](${CLAUDE_PLUGIN_ROOT}/shared/connector-reference.md) — Inline connection creation, Grep-first for large generated files.
+
+# Add Connector (Canonical)
+
+This is the **single implementation** for all connector-binding skills.
+
+Specialized `/add-*` skills are thin wrappers that call this skill with presets. If this skill is called from a wrapper, **do not delegate back**.
+
+## Workflow
+
+1. Verify workspace + auth.
+2. Resolve `api-id` (discover via `ms connector list` if the user didn't supply one), `mode`, and required arguments.
+3. Run the matching `ms app add ...` command.
+4. Run `npm run build`.
+5. Record the binding in `memory-bank.md` if present.
+
+---
+
+### Step 1: Verify Project + Env
+
+```bash
+test -f ms.config.json || { echo "Not in a Microsoft App workspace."; exit 1; }
+BIN=ms
+$BIN auth status
+```
+
+### Step 2: Resolve Inputs
+
+Collect:
+
+- `api-id` (required — see resolution order below)
+- `mode` = `action` | `table` | `procedure`
+- `connection-id` (optional interactive, required for non-interactive where applicable)
+
+Additional by mode:
+
+- `table`: `dataset`, `table`
+- `procedure`: `dataset`, `sql-stored-procedure`
+
+#### 2a. Resolve `api-id`
+
+Try sources in this order; stop at the first one that yields a value:
+
+1. **Wrapper preset.** If invoked by a specialized `/add-*` skill (see "Common Presets" below), use the preset api-id and skip discovery.
+2. **Caller-supplied.** If `$ARGUMENTS` includes an `api-id` (e.g., `api-id=shared_office365`), use it verbatim.
+3. **User-supplied verbatim string.** If the user already typed an api-id (anything matching the `shared_*` / `dataverse` / `microsoftcopilotstudio` shape, or a string they explicitly call an api-id), use it.
+4. **Discovery via `ms connector list`.** **Do not ask the user to type an api-id from memory.** Instead:
+
+   a. Ask one question: "Which connector do you need? (a short keyword like 'teams', 'sql', 'sharepoint', 'salesforce' is fine — I'll search the catalog.)" Capture the keyword as `{term}`.
+
+   b. Search the catalog:
+      ```bash
+      $BIN connector list --search "<term>"
+      ```
+      Parse the output into a short table (display name + api-id). If the result set is large (more than ~10 rows), narrow with a more specific term and re-run rather than dumping everything.
+
+   c. Present the candidates to the user via `AskUserQuestion` with the display names as choices (and api-ids in parentheses for transparency). Map their selection back to the api-id; never ask them to retype it.
+
+   d. If `ms connector list --search "<term>"` returns no results, fall back to `ms connector list` with no filter, surface a representative slice, and ask the user to refine the term. Do not proceed with a guessed api-id.
+
+5. **Validation.** Once an api-id is chosen, confirm it's real before spending a build cycle on it: `$BIN connector list-actions --connector <api-id> --search ""` should succeed. If the CLI replies that the api-id is unknown, drop back to step 4 — don't keep retrying with the same value.
+
+#### 2b. Resolve `mode`
+
+For api-ids in the "Common Presets" table, use that table's mode. Otherwise ask the user one question, framed by what they want to do:
+
+- "Read or write rows in a tabular store?" → `table`
+- "Trigger an operation (send a message, post a file, list events)?" → `action`
+- "Call a SQL stored procedure?" → `procedure`
+
+If the caller is a wrapper skill, use wrapper presets as defaults and only ask for missing fields.
+
+### Step 3: Execute Add Command
+
+**Action mode**
+
+```bash
+$BIN app add action --api-id <api-id>
+```
+
+**Table mode**
+
+```bash
+$BIN app add table --api-id <api-id> --dataset "<dataset>" --table "<table>"
+```
+
+**Procedure mode**
+
+```bash
+$BIN app add procedure \
+  --api-id <api-id> \
+  --connection-id "<connection-id>" \
+  --dataset "<dataset>" \
+  --sql-stored-procedure "<schema.proc>"
+```
+
+### Step 4: Build
+
+```bash
+npm run build
+```
+
+### Step 5: Memory Update
+
+If `memory-bank.md` exists, record `api-id`, mode, and parameters used.
+
+---
+
+## Common Presets
+
+| Wrapper skill        | api-id                          | mode       |
+| -------------------- | ------------------------------- | ---------- |
+| `/add-dataverse`     | `dataverse`                     | `table`    |
+| `/add-sharepoint`    | `shared_sharepointonline`       | `table`    |
+| `/add-excel`         | `shared_excelonlinebusiness`    | `table`    |
+| `/add-office365`     | `shared_office365`              | `action`   |
+| `/add-teams`         | `shared_teams`                  | `action`   |
+| `/add-onedrive`      | `shared_onedriveforbusiness`    | `action`   |
+| `/add-azuredevops`   | `shared_visualstudioteamservices` | `action` |
+| `/add-mcscopilot`    | `microsoftcopilotstudio`        | `action`   |
+| `/add-procedure`     | `shared_sql`                    | `procedure` |

@@ -1,0 +1,36 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh\"",
+            "bash": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh\"",
+            "powershell": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.ps1\"",
+            "async": false,
+            "timeout": 5,
+            "timeoutSec": 5
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash|bash|shell|sh|execute|execute_command|run_in_terminal|terminal|powershell|PowerShell|pwsh",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/pre-tool-use.sh\"",
+            "bash": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/pre-tool-use.sh\"",
+            "powershell": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PLUGIN_ROOT}/hooks/pre-tool-use.ps1\"",
+            "async": false,
+            "timeout": 5,
+            "timeoutSec": 5
+          }
+        ]
+      }
+    ]
+  }
+}

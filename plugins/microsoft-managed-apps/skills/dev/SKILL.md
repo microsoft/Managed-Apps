@@ -1,0 +1,95 @@
+---
+name: dev
+description: Runs a Microsoft App locally with hot reload via `ms app dev`. Use when starting or restarting local development and surfacing the App Player URL.
+user-invocable: true
+allowed-tools: Read, Grep, Bash, AskUserQuestion
+model: sonnet
+---
+
+**📋 Shared Instructions: [shared-instructions.md](${CLAUDE_PLUGIN_ROOT}/shared/shared-instructions.md)** — Cross-cutting concerns.
+
+# Local Dev
+
+Starts `ms app dev` in the project's working directory. The CLI runs two servers — a dev script (Vite or equivalent, default port 8080) and a config server — and prints the App Player URL the user opens in their browser.
+
+This skill does NOT deploy to the cloud. For that, use `/deploy`.
+
+## Workflow
+
+1. Memory Bank → 2. Verify Project + Env → 3. Start Dev Server → 4. Hand Off URL
+
+---
+
+### Step 1: Check Memory Bank
+
+Read `memory-bank.md` from the project root (the project the user has `cd`'d into, or the path captured from a prior skill invocation) for context — the app slug/GUID and which environment this project targets — so you can confirm you're starting the right app.
+
+`ms app dev` does **not** need `environmentId` or `appId` passed to it: it runs in the project working directory and reads `ms.config.json` itself. The memory bank is only for orienting yourself; if it's missing, that's fine — skip straight to Step 2.
+
+### Step 2: Verify Project + Env
+
+```bash
+test -f ms.config.json || { echo "Not in a Microsoft App workspace (no ms.config.json)."; exit 1; }
+```
+
+Probe the CLI binary and confirm auth:
+
+```bash
+BIN=ms
+$BIN auth status
+```
+
+If auth status reports the wrong UPN or is signed out, prompt the user to fix it before continuing (`ms auth login`). Don't try to repair auth silently — wrong-account dev sessions waste time downstream.
+
+### Step 3: Start the Dev Server
+
+Default invocation:
+
+```bash
+$BIN app dev
+```
+
+Flags worth surfacing (only when the user mentions a need):
+
+| Flag                       | When to use                                                                 |
+| -------------------------- | --------------------------------------------------------------------------- |
+| `--port <n>` (`-p`)        | Port 8080 is busy. Pick another (e.g., `--port 8081`).                      |
+| `--local-app-url <url>` (`-l`) | The user's Vite/dev script is on a non-default URL (default `http://localhost:3000`). |
+| `--config-only` (`-C`)     | Only run the config server. Useful when the user runs `npm run dev` separately. |
+
+If the user invoked `/dev` without arguments, run plain `$BIN app dev` first; surface flags only if the run fails.
+
+**Run in the background** (`run_in_background: true`) so the session can continue. Stream stdout via `Monitor` until the line `Ready. You can play your app locally at: <URL>` appears — that's the App Player URL.
+
+### Step 4: Hand Off the URL
+
+Print the App Player URL as a **markdown link** — terminals truncate long raw URLs (the App Player URL contains encoded query params and easily exceeds the visible width), but markdown links render as clickable text without truncation.
+
+```
+Local dev running.
+
+App Player URL: [Open app in browser](<captured URL>)
+Stop:           Ctrl+C in the dev terminal (or kill the background task).
+Restart:        /dev (from this project folder)
+```
+
+Always wrap the URL in `[label](url)` form. Do **not** print the bare URL — even when it looks short in your draft, the user's terminal width may differ and the URL will get cut off mid-token, leaving them unable to copy it.
+
+Then add a one-liner reminder of the iterate → preview → deploy loop:
+
+> "The browser tab hot-reloads as I edit code — tell me what to change. When you're happy with it, I'll commit + push your changes, run `ms app play --mode preview` for a cloud preview URL in your environment, and then ask if you want me to `/deploy`."
+
+When the user signals readiness, follow the **Ready-to-Ship Gate** in [shared-instructions.md](${CLAUDE_PLUGIN_ROOT}/shared/shared-instructions.md) — commit, push, preview, then ask about `/deploy`.
+
+If the dev server prints an error during startup (port conflict, missing `ms.config.json`, expired auth), stop the background task, surface the error verbatim, and propose the targeted fix:
+
+| Error                                                | Fix                                                                                         |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `EADDRINUSE` on 8080                                  | Re-run with `$BIN app dev --port 8081` (or kill whatever's on 8080).                        |
+| `ms.config.json not found`                         | The user is in the wrong directory, or this isn't a Microsoft App workspace. Verify and stop. |
+| `Authentication failed` (token expired)               | Run `$BIN auth login` (interactive) and retry.                                              |
+| `Failed to fetch app metadata for <app-id>`           | App was deleted in the service. Confirm with `$BIN app list --json` and restore or recreate.|
+
+Do NOT push or deploy from this skill, even if the user mentions it mid-session — bounce them to `/deploy` (which requires explicit confirmation).
+
+> **Sharing a cloud preview:** The App Player URL from `ms app dev` is local-only. Once code is pushed to main, use `/play` (`ms app play --mode preview`) to open a cloud-hosted preview URL that works for others without a deploy.
