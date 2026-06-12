@@ -25,7 +25,9 @@ labels: bug
 
 ## Environment information
 
-- Framework, build tool or relevant package used: [React,Vite, Webpack, etc]
+- Node.js and npm version: [e.g. node v20.11.0, npm 10.2.4 — run `node -v` and `npm -v`]
+- Are you on an enterprise network (e.g. behind a corporate proxy or firewall)? [Yes/No — include proxy details if relevant]
+- Framework, build tool or relevant package used: [React, Vite, Webpack, etc]
 - Any connection/components: [Office365, SQL, etc]
 
 ## Additional context
