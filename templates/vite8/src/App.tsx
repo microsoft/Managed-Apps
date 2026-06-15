@@ -38,7 +38,7 @@ function App() {
             <use href="/icons.svg#documentation-icon"></use>
           </svg>
           <h2>Microsoft Managed Apps Documentation</h2>
-          <p>Build and ship governed apps</p>
+          <p>Build and ship managed apps</p>
           <ul>
             <li>
               <a
