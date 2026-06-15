@@ -6,7 +6,7 @@
   background: var(--accent-bg);
   border: 2px solid transparent;
   transition: border-color 0.3s;
-  margin-bottom: 24px;
+  margin-bottom: 8px;
 
   &:hover {
     border-color: var(--accent-border);
@@ -28,7 +28,8 @@
   }
 
   .base {
-    width: 170px;
+    width: 119px;
+    height: auto;
     position: relative;
     z-index: 0;
   }
@@ -40,16 +41,16 @@
 
   .framework {
     z-index: 1;
-    top: 34px;
-    height: 28px;
+    top: 24px;
+    height: 20px;
     transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
       scale(1.4);
   }
 
   .vite {
     z-index: 0;
-    top: 107px;
-    height: 26px;
+    top: 75px;
+    height: 18px;
     width: auto;
     transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
       scale(0.8);
@@ -59,7 +60,7 @@
 #center {
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: 16px;
   place-content: center;
   place-items: center;
   flex-grow: 1;
@@ -70,7 +71,8 @@
   }
 }
 
-#next-steps {
+#next-steps,
+#ma-steps {
   display: flex;
   border-top: 1px solid var(--border);
   text-align: left;
@@ -95,7 +97,8 @@
   }
 }
 
-#docs {
+#docs,
+#ma-docs {
   border-right: 1px solid var(--border);
 
   @media (max-width: 1024px) {
@@ -104,7 +107,8 @@
   }
 }
 
-#next-steps ul {
+#next-steps ul,
+#ma-steps ul {
   list-style: none;
   padding: 0;
   display: flex;
@@ -156,9 +160,20 @@
 #spacer {
   height: 88px;
   border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-inline: 32px;
   @media (max-width: 1024px) {
     height: 48px;
+    padding-inline: 20px;
   }
+}
+
+.legal {
+  font-size: 13px;
+  color: var(--text);
+  opacity: 0.6;
 }
 
 .ticks {
