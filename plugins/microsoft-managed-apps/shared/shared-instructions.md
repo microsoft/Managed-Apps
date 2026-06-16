@@ -137,6 +137,16 @@ Normal flow: pass no environment flag and let `ms app create` resolve an environ
 
 `MS_CLI_ORIGIN=plugin/<host-agent>` (e.g. `plugin/claude-code`, `plugin/copilot-cli`, or `plugin/unknown` when the host can't be detected) is set automatically on every `ms` invocation by the plugin's PreToolUse hook (`hooks/pre-tool-use.sh` / `.ps1`). No skill action required. If the executed command in the shell log has a leading `export MS_CLI_ORIGIN=...` / `$env:MS_CLI_ORIGIN=...` that you didn't write, that's the hook — leave it alone. The hook respects any pre-existing `MS_CLI_ORIGIN` value.
 
+## Shell Compatibility
+
+Many command snippets in this plugin are shown in bash syntax because the CLI skills are authored that way. If you're running in PowerShell on Windows, adapt the examples instead of copying them verbatim:
+
+- Use `$env:VAR = 'value'` instead of `export VAR=value`.
+- Use `2>$null` instead of `2>/dev/null`.
+- Use `;` instead of `&&` when you need a sequence that should run in PowerShell.
+- Do not add `MS_CLI_ORIGIN` yourself unless you are intentionally overriding it; the PreToolUse hook injects it automatically for every `ms` invocation.
+- If a command example is shell-specific, prefer the equivalent for the shell you are actually using.
+
 ---
 
 ## Command Failure Handling

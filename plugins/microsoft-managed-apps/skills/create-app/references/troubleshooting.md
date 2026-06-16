@@ -4,6 +4,8 @@
 
 **The most common failure on the first `ms app create` for a new account.**
 
+**Shell note:** if you are in PowerShell and see `export: command not found`, you are looking at a bash-only snippet. Rerun the command without the `export` prefix, or use the PowerShell equivalents from [prerequisites-reference.md](./prerequisites-reference.md).
+
 ### Symptom
 
 ```

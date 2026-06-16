@@ -18,6 +18,8 @@
 
 The CLI is published on the public npm registry: [`@microsoft/managed-apps-cli`](https://www.npmjs.com/package/@microsoft/managed-apps-cli).
 
+**Shell note:** the snippets below are shown in bash. If you're on PowerShell, use the equivalents called out in [shared-instructions.md](../../shared/shared-instructions.md#shell-compatibility) instead of copying the bash syntax literally.
+
 ### Global install (pinned to `@latest`)
 
 ```bash
@@ -30,6 +32,12 @@ Install globally so the `ms` binary is on PATH. Subsequent `ms` invocations reso
 
 ```bash
 LATEST=$(npm view @microsoft/managed-apps-cli@latest version 2>/dev/null | tr -d '\r')
+```
+
+PowerShell equivalent:
+
+```powershell
+$LATEST = (npm view @microsoft/managed-apps-cli@latest version 2>$null).Trim()
 ```
 
 If the installed version differs from `$LATEST`, ask the user before upgrading. The `@latest` tag updates regularly.
