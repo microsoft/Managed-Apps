@@ -37,10 +37,10 @@ LATEST=$(npm view @microsoft/managed-apps-cli@latest version 2>/dev/null | tr -d
 PowerShell equivalent:
 
 ```powershell
-$LATEST = (npm view @microsoft/managed-apps-cli@latest version 2>$null).Trim()
+$Latest = (npm view @microsoft/managed-apps-cli@latest version 2>$null).Trim()
 ```
 
-If the installed version differs from `$LATEST`, ask the user before upgrading. The `@latest` tag updates regularly.
+If the installed version differs from `$Latest`, ask the user before upgrading. The `@latest` tag updates regularly.
 
 ### Override patterns (only with explicit user direction)
 
