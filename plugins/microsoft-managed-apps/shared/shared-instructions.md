@@ -137,6 +137,18 @@ Normal flow: pass no environment flag and let `ms app create` resolve an environ
 
 `MS_CLI_ORIGIN=plugin/<host-agent>` (e.g. `plugin/claude-code`, `plugin/copilot-cli`, or `plugin/unknown` when the host can't be detected) is set automatically on every `ms` invocation by the plugin's PreToolUse hook (`hooks/pre-tool-use.sh` / `.ps1`). No skill action required. If the executed command in the shell log has a leading `export MS_CLI_ORIGIN=...` / `$env:MS_CLI_ORIGIN=...` that you didn't write, that's the hook — leave it alone. The hook respects any pre-existing `MS_CLI_ORIGIN` value.
 
+## Shell Compatibility
+
+Many command snippets in this plugin are shown in bash syntax because the CLI skills are authored that way. If you're running in PowerShell on Windows, adapt the examples instead of copying them verbatim:
+
+- Use `$env:VAR = 'value'` instead of `export VAR=value`.
+- Use `2>$null` instead of `2>/dev/null`.
+- For command chaining: PowerShell 7+ (`pwsh`) supports `&&` and `||` natively with the same short-circuit semantics as bash, so `cmd1 && cmd2` works as-is. Windows PowerShell 5.1 (the built-in `powershell.exe`) does **not** support `&&` — there, run the commands as separate statements with explicit exit-code checks (e.g. `cmd1; if ($LASTEXITCODE -ne 0) { return }; cmd2`). Do **not** just substitute `;` for `&&`: `;` runs the next command unconditionally and silently proceeds past a failed prerequisite check.
+- Do not add `MS_CLI_ORIGIN` yourself unless you are intentionally overriding it; the PreToolUse hook injects it automatically for every `ms` invocation.
+- If a command example is shell-specific, prefer the equivalent for the shell you are actually using.
+
+> **Windows PowerShell vs PowerShell 7:** "PowerShell" on Windows may mean either Windows PowerShell 5.1 (`powershell.exe`, ships with Windows) or PowerShell 7+ (`pwsh`, cross-platform). They differ in command-chaining and some operators. When in doubt, check `$PSVersionTable.PSVersion` and prefer `pwsh` for bash-like `&&`/`||` chaining.
+
 ---
 
 ## Command Failure Handling

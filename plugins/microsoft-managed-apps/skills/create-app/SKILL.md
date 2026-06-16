@@ -33,6 +33,8 @@ Check for `memory-bank.md` per [shared-instructions.md](${CLAUDE_PLUGIN_ROOT}/sh
 
 Run prerequisite checks **first** — no point gathering requirements if the environment isn't ready. Full details in [prerequisites-reference.md](./references/prerequisites-reference.md).
 
+The commands below are shown in bash syntax. If you are running PowerShell on Windows, use the equivalents described in [shared-instructions.md](${CLAUDE_PLUGIN_ROOT}/shared/shared-instructions.md#shell-compatibility) and the PowerShell example in [prerequisites-reference.md](./references/prerequisites-reference.md) instead of copying the bash snippets literally.
+
 ```bash
 node --version                                                    # Must be v22+
 git --version                                                     # Required (used by `ms app create` to init the repo)
