@@ -143,7 +143,7 @@ Many command snippets in this plugin are shown in bash syntax because the CLI sk
 
 - Use `$env:VAR = 'value'` instead of `export VAR=value`.
 - Use `2>$null` instead of `2>/dev/null`.
-- Use `;` instead of `&&` when you need a sequence that should run in PowerShell.
+- PowerShell 7+ supports `&&` natively with the same short-circuit semantics as bash. For older versions, run commands as separate statements and check `$LASTEXITCODE` after each.
 - Do not add `MS_CLI_ORIGIN` yourself unless you are intentionally overriding it; the PreToolUse hook injects it automatically for every `ms` invocation.
 - If a command example is shell-specific, prefer the equivalent for the shell you are actually using.
 
