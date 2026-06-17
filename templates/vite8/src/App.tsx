@@ -32,12 +32,92 @@ function App() {
 
       <div className="ticks"></div>
 
+      <section id="ma-steps">
+        <div id="ma-docs">
+          <svg className="icon" role="presentation" aria-hidden="true">
+            <use href="/icons.svg#documentation-icon"></use>
+          </svg>
+          <h2>Microsoft Managed Apps Documentation</h2>
+          <p>Build and ship managed apps</p>
+          <ul>
+            <li>
+              <a
+                href="https://go.microsoft.com/fwlink/?LinkId=2369054"
+                target="_blank"
+              >
+                <svg
+                  className="button-icon"
+                  role="presentation"
+                  aria-hidden="true"
+                >
+                  <use href="/icons.svg#book-icon"></use>
+                </svg>
+                Documentation
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://go.microsoft.com/fwlink/?LinkId=2368962"
+                target="_blank"
+              >
+                <svg
+                  className="button-icon"
+                  role="presentation"
+                  aria-hidden="true"
+                >
+                  <use href="/icons.svg#quickstart-icon"></use>
+                </svg>
+                Quickstart
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div id="ma-project">
+          <svg className="icon" role="presentation" aria-hidden="true">
+            <use href="/icons.svg#social-icon"></use>
+          </svg>
+          <h2>Connect with Microsoft Managed Apps</h2>
+          <p>The project and its packages</p>
+          <ul>
+            <li>
+              <a href="https://github.com/microsoft/Managed-Apps" target="_blank">
+                <svg
+                  className="button-icon"
+                  role="presentation"
+                  aria-hidden="true"
+                >
+                  <use href="/icons.svg#github-icon"></use>
+                </svg>
+                GitHub
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://www.npmjs.com/package/@microsoft/managed-apps-cli"
+                target="_blank"
+              >
+                <svg
+                  className="button-icon"
+                  role="presentation"
+                  aria-hidden="true"
+                >
+                  <use href="/icons.svg#npm-icon"></use>
+                </svg>
+                npm
+              </a>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <div className="ticks"></div>
+
       <section id="next-steps">
         <div id="docs">
           <svg className="icon" role="presentation" aria-hidden="true">
             <use href="/icons.svg#documentation-icon"></use>
           </svg>
-          <h2>Documentation</h2>
+          <h2>Vite Documentation</h2>
           <p>Your questions, answered</p>
           <ul>
             <li>
@@ -58,7 +138,7 @@ function App() {
           <svg className="icon" role="presentation" aria-hidden="true">
             <use href="/icons.svg#social-icon"></use>
           </svg>
-          <h2>Connect with us</h2>
+          <h2>Connect with Vite</h2>
           <p>Join the Vite community</p>
           <ul>
             <li>
@@ -114,7 +194,9 @@ function App() {
       </section>
 
       <div className="ticks"></div>
-      <section id="spacer"></section>
+      <section id="spacer">
+        <p className="legal">npm is a registered trademark of npm, Inc.</p>
+      </section>
     </>
   )
 }
