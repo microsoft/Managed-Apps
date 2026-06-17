@@ -118,8 +118,14 @@ try {
     $inlinePattern = '(^|[;&|()\n\r])\s*([A-Za-z_][A-Za-z0-9_]*=\S*\s+)*(export\s+MS_CLI_ORIGIN=|set\s+MS_CLI_ORIGIN=|MS_CLI_ORIGIN=|\$env:MS_CLI_ORIGIN\s*=)'
     if ($command -match $inlinePattern) { Write-AllowUnchanged }
 
+    # Detect if the command will run in PowerShell context.
+    # Primary: check if this hook script itself is running in PowerShell (most reliable).
+    # Fallback: check explicit tool_name field.
     $isPowerShellTool = $false
-    if ($toolName) {
+    if ($PSVersionTable) {
+        # Hook script is running in PowerShell; assume PowerShell commands
+        $isPowerShellTool = $true
+    } elseif ($toolName) {
         $tn = $toolName.ToLowerInvariant()
         if ($tn -eq 'powershell' -or $tn -eq 'pwsh') { $isPowerShellTool = $true }
     }
