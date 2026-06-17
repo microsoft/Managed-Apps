@@ -136,14 +136,15 @@ try {
         # which `Test-Path Env:` treats as "set" (unlike `-not $env:...`).
         $newCommand = "if (-not (Test-Path Env:MS_CLI_ORIGIN)) { `$env:MS_CLI_ORIGIN = '$ORIGIN_VALUE' }; $command"
     } else {
-        # `${VAR-default}` (no colon) expands to the default ONLY when VAR is
-        # unset, so any pre-existing user value — including an intentionally-
-        # empty one — is preserved at exec time. The leading `$` of the bash
-        # expansion is backtick-escaped so PowerShell does not interpolate it;
-        # only `$ORIGIN_VALUE` is expanded here. The `&&` chain runs the export
-        # before the user command, and `export` makes the value visible to
-        # chained segments and to the spawned `ms` process.
-        $newCommand = "export MS_CLI_ORIGIN=`"`${MS_CLI_ORIGIN-$ORIGIN_VALUE}`" && $command"
+        # Non-PowerShell context (bash/shell): the command will execute in a bash
+        # subprocess, so we can safely use bash syntax. `${VAR-default}` (no colon)
+        # expands to the default ONLY when VAR is unset, so any pre-existing user
+        # value — including an intentionally-empty one — is preserved at exec time.
+        # The `&&` chain runs the export before the user command, and `export` makes
+        # the value visible to chained segments and to the spawned `ms` process.
+        # We do NOT backtick-escape the `$` here because bash will evaluate this
+        # syntax in its own context, not PowerShell's context.
+        $newCommand = 'export MS_CLI_ORIGIN="${MS_CLI_ORIGIN-' + $ORIGIN_VALUE + '}" && ' + $command
     }
 
     Write-AllowWithRewrite -NewCommand $newCommand -OriginalInput $inputHash
