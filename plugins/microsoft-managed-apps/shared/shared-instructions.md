@@ -244,6 +244,15 @@ This gate lives between local-dev iteration and `/deploy`. Skills that hand off 
 
 Do not announce steps before executing them. Proceed directly through the workflow.
 
+## URL Formatting
+
+Any user-facing URL must be emitted as a markdown link on a single physical line.
+
+- Use `[label](<full-url>)`.
+- Do not print bare URLs.
+- Do not split URLs across multiple lines.
+- Prefer short labels like `Open app in browser`, `Open live app`, `Open preview`.
+
 ---
 
 ## Adding New Shared Instructions

@@ -66,12 +66,12 @@ Flags:
 | `--environment-id` / `-e` | No | Environment ID override. Defaults to `ms.config.json`. |
 | `--json` | No | Machine-readable envelope: `{ success, appName, appShareLinkId, shareLinkUrl }`. |
 
-On success the CLI prints the share link URL on its own line so it copies cleanly. Capture and present that URL to the user:
+On success the CLI prints the share link URL. Capture and present that URL to the user as a markdown link on one line:
 
 ```
 Share link created for 'my-app' (id: a3f1). Anyone in your tenant who opens
 this link will be granted Microsoft App Reader access. Share URL:
-https://apps.powerapps.com/play/e/<env-id>/app/<app-guid>?shareLink=a3f1...
+[Open share link](<https://apps.powerapps.com/play/e/ENV_ID/app/APP_ID?shareLink=a3f1abcd>)
 ```
 
 #### List
@@ -116,7 +116,7 @@ $BIN app share link revoke --link-id a3f1 --force
 
 ### Step 5: Surface Result
 
-**Create:** Print the full share URL. Remind the user this grants read-only app access to anyone in the tenant who opens it, and that they can revoke it at any time with `ms app share link revoke --link-id <id>`.
+**Create:** Print the full share URL as `[Open share link](<url>)` on one line. Remind the user this grants read-only app access to anyone in the tenant who opens it, and that they can revoke it at any time with `ms app share link revoke --link-id <id>`.
 
 **List:** Present the table. Offer to create or revoke links from here if appropriate.
 

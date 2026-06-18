@@ -73,7 +73,7 @@ Stop:           Ctrl+C in the dev terminal (or kill the background task).
 Restart:        /dev (from this project folder)
 ```
 
-Always wrap the URL in `[label](url)` form. Do **not** print the bare URL — even when it looks short in your draft, the user's terminal width may differ and the URL will get cut off mid-token, leaving them unable to copy it.
+Always wrap the URL in `[label](<url>)` form on one line. Do **not** print the bare URL, and do **not** insert line breaks inside the markdown link — even when it looks short in your draft, the user's terminal width may differ and the URL will get cut off mid-token, leaving them unable to copy it.
 
 Then add a one-liner reminder of the iterate → preview → deploy loop:
 
