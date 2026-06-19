@@ -61,19 +61,22 @@ If the user invoked `/dev` without arguments, run plain `$BIN app dev` first; su
 
 **Run in the background** (`run_in_background: true`) so the session can continue. Stream stdout via `Monitor` until the line `Ready. You can play your app locally at: <URL>` appears — that's the App Player URL.
 
-### Step 4: Hand Off the URL
+### Step 4: Open the Browser and Hand Off the URL
 
-Print the App Player URL as a **markdown link** — terminals truncate long raw URLs (the App Player URL contains encoded query params and easily exceeds the visible width), but markdown links render as clickable text without truncation.
+**Open the browser automatically** — run `Start-Process "<captured URL>"` (Windows) or `open "<captured URL>"` (macOS) / `xdg-open "<captured URL>"` (Linux) so the user sees their app immediately without copy-pasting. If the open command fails, fall back to printing the URL.
+
+Print the App Player URL as a **markdown link** so it stays clickable even in narrow terminals. **Also show the URL on its own line** — markdown links can render as plain label text in some environments (e.g. tables), hiding the actual URL from the user.
 
 ```
-Local dev running.
+Local dev running — opened the app in your default browser.
 
-App Player URL: [Open app in browser](<captured URL>)
-Stop:           Ctrl+C in the dev terminal (or kill the background task).
-Restart:        /dev (from this project folder)
+Local URL: [Open app in browser](<captured URL>)
+           <captured URL>
+Stop:      Ctrl+C in the dev terminal (or kill the background task).
+Restart:   /dev (from this project folder)
 ```
 
-Always wrap the URL in `[label](url)` form. Do **not** print the bare URL — even when it looks short in your draft, the user's terminal width may differ and the URL will get cut off mid-token, leaving them unable to copy it.
+Do **not** show the git remote URL in the dev summary — it's an internal detail that confuses users who expect a browser-openable link. The only URL to surface is the App Player URL printed by `ms app dev` (the domain varies by cloud/region — always use the exact URL the CLI outputs, never hardcode the host).
 
 Then add a one-liner reminder of the iterate → preview → deploy loop:
 

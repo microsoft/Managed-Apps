@@ -240,10 +240,12 @@ If `npm run build` fails, fix the errors before running `ms app dev`. Don't hand
 `ms app dev` runs two servers and prints an App Player URL like:
 
 ```
-Ready. You can play your app locally at: https://apps.powerapps.com/play/e/<env-id>/app/<app-id>?...
+Ready. You can play your app locally at: https://play.<cloud-domain>/apps/dev?ms_appUrl=http%3A%2F%2Flocalhost%3A5173%2F&ms_appConfigUrl=http%3A%2F%2Flocalhost%3A<port>
 ```
 
-Hand that URL to the user **as a markdown link** (`[Open app in browser](<url>)`). The raw URL is long enough to be truncated by most terminals; markdown link form keeps it clickable and copyable. **Nothing has been deployed to the cloud at this point** — the app exists in the service catalog but its runtime is local, with the connectors and UI you just built wired up.
+The domain varies by cloud/region (e.g. `play.preview.managedapps.cloud.microsoft.com`, `play.managedapps.cloud.microsoft.com`, or a sovereign-cloud equivalent). **Always use the exact URL the CLI prints** — do not hardcode or rewrite the host.
+
+Hand that URL to the user **as a markdown link** (`[Open app in browser](<url>)`) **and also print the raw URL on its own line** — markdown links can render as plain label text in some environments (e.g. tables), hiding the actual URL. **Then open the browser automatically** using `Start-Process` (Windows) or `open` (macOS) / `xdg-open` (Linux). **Nothing has been deployed to the cloud at this point** — the app exists in the service catalog but its runtime is local, with the connectors and UI you just built wired up.
 
 The dev server runs in the foreground. Either:
 - Keep it running and tell the user how to stop it (Ctrl+C) and restart (`ms app dev`).
@@ -255,9 +257,10 @@ Provide:
 
 - **App**: display name, app GUID, version `v1.0.0`.
 - **Project path**: `$PROJECT_ROOT`.
-- **Remote git URL**.
+- **Git remote URL** (label it "Git Remote", not just "Remote" — users confuse "Remote" with a browser-openable link).
 - **Connectors wired up**: list each one added in Step 8 + which screens use it.
-- **App Player URL** (local dev) as a markdown link.
+- **App Player URL** (local dev) as a markdown link **and** the raw URL on its own line — markdown links can render as plain label text in some environments, hiding the actual URL.
+- **Open the browser automatically** after printing the URL — don't wait for the user to copy-paste it.
 - **What this URL is**: a live preview of the running app. Edits made in this chat will hot-reload there in real time — the user does **not** need to restart anything to see changes.
 - **Next steps** (in this exact framing):
   1. Tell me what to change — I'll edit the code and you'll see it update live in the browser.
@@ -308,7 +311,7 @@ ms app create \
 npm install
 npm run build
 ms app dev
-# → Ready. Play locally at: https://apps.powerapps.com/play/e/<env-id>/app/7ea6...
+# → Ready. Play locally at: https://play.<cloud-domain>/apps/dev?ms_appUrl=...
 ```
 
 **Final summary (verbatim format):**
@@ -321,8 +324,9 @@ App GUID: 7ea6...
 Environment: Default-<guid> (auto-routed Developer environment)
 Cluster: prod
 Project: /Users/alice/work/sample_one
-Remote: https://<env-id>.d.environment.api.powerplatform.com/...
-Local URL: [Open app in browser](https://apps.powerapps.com/play/e/<env-id>/app/7ea6...?...)
+Git Remote: https://<env-id>.d.environment.api.powerplatform.com/...
+Local URL: [Open app in browser](<URL from ms app dev output>)
+           <URL from ms app dev output>
 
 Nothing has been deployed to the cloud. The app (with its connectors and UI
 already wired up) runs from your machine via `ms app dev`. The browser tab
