@@ -135,30 +135,20 @@ If environment routing fails, surface the actual error to the user rather than a
 
 ### Step 7: Scaffold
 
-Use the **current working directory** as the project root. Do not create or switch to a separate directory inside this skill.
-
-Before running `ms app create`, verify the current folder is empty (ignore hidden VCS/system files like `.git`, `.DS_Store`, `Thumbs.db`, `.vscode`). If it is not empty, ask the user whether to continue in a different empty folder and STOP until they confirm.
+The CLI creates a new folder for the project. Derive a folder name from the display name (lowercase, hyphens, no spaces — e.g. "Sample One" → `sample-one`). Run the command from the **current working directory**; the CLI will create the subfolder automatically.
 
 ```bash
-PROJECT_ROOT="$(pwd)"
-
-# Current folder must be empty for first scaffold (ignoring common hidden/system files).
-if find "$PROJECT_ROOT" -mindepth 1 -maxdepth 1 \
-  ! -name '.git' \
-  ! -name '.DS_Store' \
-  ! -name 'Thumbs.db' \
-  ! -name '.vscode' \
-  | grep -q .; then
-  echo "Current directory is not empty. Please run /create-app from an empty folder."
-  exit 1
-fi
-```
-
-```bash
-$BIN app create \
+$BIN app create "$FOLDER_NAME" \
   --display-name "$DISPLAY_NAME" \
   --non-interactive
 # Append --environment-id "$ENV_ID" ONLY if the user explicitly provided an environment ID (see Step 6).
+```
+
+After the command succeeds, `cd` into the new folder and set `PROJECT_ROOT`:
+
+```bash
+cd "$FOLDER_NAME"
+PROJECT_ROOT="$(pwd)"
 ```
 
 Capture from the output: the app GUID, the environment ID/name resolved by the CLI, and the remote git URL. (The environment ID appears in the App Player URL and is needed for that link — it's an internal detail, not something to surface to the user.)
@@ -176,7 +166,7 @@ The CLI installed a `[credential ...]` block in `.git/config` but GCM still need
 
 **Recovery sequence** (the app exists in the service but is empty locally):
 
-Before running recovery, ask for explicit user confirmation because this sequence deletes files in the current project folder and recreates it.
+Before running recovery, ask for explicit user confirmation because this sequence deletes the scaffolded folder and recreates it.
 
 ```bash
 cd "$PROJECT_ROOT"
@@ -186,14 +176,14 @@ $BIN app delete --app "$APP_ID" --force --non-interactive       # remove the hal
 [ -n "$APP_ID" ] && [ -n "$PROJECT_ROOT" ] || { echo "Missing APP_ID or PROJECT_ROOT; refusing cleanup."; exit 1; }
 # Guardrail: never allow cleanup when project root is home or filesystem root.
 [ "$PROJECT_ROOT" != "$HOME" ] && [ "$PROJECT_ROOT" != "/" ] || { echo "Refusing cleanup at unsafe path: $PROJECT_ROOT"; exit 1; }
-find "$PROJECT_ROOT" -mindepth 1 -maxdepth 1 \
-  ! -name '.git' \
-  ! -name '.DS_Store' \
-  ! -name 'Thumbs.db' \
-  ! -name '.vscode' \
-  -exec rm -rf {} +                                              # clean project contents, preserve folder
-cd "$PROJECT_ROOT"
+cd ..
+rm -rf "$FOLDER_NAME"
 # Re-run `ms app create` — auth is now cached, second run completes end-to-end.
+$BIN app create "$FOLDER_NAME" \
+  --display-name "$DISPLAY_NAME" \
+  --non-interactive
+cd "$FOLDER_NAME"
+PROJECT_ROOT="$(pwd)"
 ```
 
 Detect the trap by matching `Authentication failed for 'https://...d.environment.api...'` in the create output. Surface the suspected trap and proposed recovery, then wait for explicit user approval before running the destructive cleanup steps.
@@ -294,14 +284,15 @@ ms --version                         # → 0.3.x
 # Step 5: Auth
 ms auth status                       # → signed in as alice@contoso.onmicrosoft.com
 
-# Step 7: Scaffold (run from an empty current folder)
-pwd                                 # → /Users/alice/work/sample_one
-ms app create \
+# Step 7: Scaffold (run from any directory; CLI creates the subfolder)
+pwd                                 # → /Users/alice/work
+ms app create sample-one \
   --display-name "Sample One" \
   --non-interactive
 # → App created. AppId: 7ea6...
 # → Environment: Default-<guid> (auto-routed)
 # → Remote: https://<env-id>.d.environment.api.powerplatform.com/...
+cd sample-one
 
 # Step 8: Add Data Sources (none in this hello-world example — skipped)
 
@@ -323,7 +314,7 @@ App: Sample One v1.0.0
 App GUID: 7ea6...
 Environment: Default-<guid> (auto-routed Developer environment)
 Cluster: prod
-Project: /Users/alice/work/sample_one
+Project: /Users/alice/work/sample-one
 Git Remote: https://<env-id>.d.environment.api.powerplatform.com/...
 Local URL: [Open app in browser](<URL from ms app dev output>)
            <URL from ms app dev output>
