@@ -91,7 +91,7 @@ Present the URL the CLI printed as a markdown link on a single line (`[label](<u
 For live mode, surface the CLI's built-in warning:
 
 ```
-Live URL for 'my-app': [Open live app](<https://apps.powerapps.com/play/e/ENV_ID/app/APP_ID>)
+Live URL for 'my-app': [Open live app](<https://play.managedapps.cloud.microsoft/appframework/e/ENV_ID/app/APP_ID>)
 
 ⚠ Live does not auto-update. Run /deploy to publish new code to the live URL.
 ```
@@ -99,13 +99,13 @@ Live URL for 'my-app': [Open live app](<https://apps.powerapps.com/play/e/ENV_ID
 For preview:
 
 ```
-Preview URL for 'my-app' (main): [Open preview](<https://apps.powerapps.com/play/e/ENV_ID/app/APP_ID/branch/main>)
+Preview URL for 'my-app' (main): [Open preview](<https://play.managedapps.cloud.microsoft/appframework/e/ENV_ID/app/APP_ID/branch/main>)
 ```
 
 For commit-pinned preview:
 
 ```
-Preview URL for 'my-app' (commit abc1234): [Open preview at abc1234](<https://apps.powerapps.com/play/e/ENV_ID/app/APP_ID/commit/abc1234>)
+Preview URL for 'my-app' (commit abc1234): [Open preview at abc1234](<https://play.managedapps.cloud.microsoft/appframework/e/ENV_ID/app/APP_ID/commit/abc1234>)
 ```
 
 ---

@@ -82,10 +82,4 @@ The MAAF-CLI's add flows create or reuse connections on the fly. You don't need 
 - **`--non-interactive`**: when scripting, the CLI can't open a browser to create a connection, so it expects `--connection-id`. Discover one via `ms app show --json` for connections already bound, or via the maker-portal Connections page.
 - **`add procedure` for SQL**: this skill expects an explicit `--connection-id` because each SQL connection points at a different database.
 
-When a connection ID is required and the user doesn't have one, direct them to:
-
-```
-https://make.powerapps.com/environments/<env-id>/connections
-```
-
-The maker portal handles consent + sign-in for the connector; the connection appears in the list after a refresh.
+When a connection ID is required and the user doesn't have one, have them mint it by running the relevant `/add-*` skill interactively (omit `--non-interactive`). The CLI opens a browser through the Microsoft Apps player to create and consent the connection, then reuses it — afterwards the connection ID is discoverable via `ms app show --json`.

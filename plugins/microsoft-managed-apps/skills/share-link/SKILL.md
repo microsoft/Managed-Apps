@@ -71,7 +71,7 @@ On success the CLI prints the share link URL. Capture and present that URL to th
 ```
 Share link created for 'my-app' (id: a3f1). Anyone in your tenant who opens
 this link will be granted Microsoft App Reader access. Share URL:
-[Open share link](<https://apps.powerapps.com/play/e/ENV_ID/app/APP_ID?shareLink=a3f1abcd>)
+[Open share link](<https://play.managedapps.cloud.microsoft/appframework/e/ENV_ID/app/APP_ID?shareLink=a3f1abcd>)
 ```
 
 #### List
