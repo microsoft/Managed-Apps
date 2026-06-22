@@ -2,9 +2,42 @@
 
 **Use this guide to select the right connector(s) for user scenarios.** This ensures consistent, intelligent connector recommendations across all `/add-*` skills and the `/add-datasource` router.
 
+> **Note:** This guide covers the most common connectors. There are 1400+ connectors available in Power Platform. See [Discovering All Available Connectors](#discovering-all-available-connectors) below.
+
+---
+
+## Discovering All Available Connectors
+
+The Power Platform has **1400+ connectors**. This guide shows the most common ones, but you can discover others:
+
+### **Via CLI**
+
+```bash
+# Search for a specific connector (e.g., Salesforce, SAP, Slack)
+ms connector list --search "salesforce"
+
+# List operations available on a connector
+ms connector list-actions --connector <api-id>
+ms connector list-actions --connector shared_office365 --search Mail
+```
+
+### **Via Plugin Skills**
+
+- **`/add-connector`** — Ask for a keyword ("salesforce", "slack", "jira") and it will search and present options
+- **`/list-connections`** — View connectors already bound to your app, or explore operations on a specific connector
+
+### **Via Power Platform Docs**
+
+Search the [Power Platform connectors reference](https://learn.microsoft.com/en-us/connectors/) for:
+- Specific services you want to integrate
+- Connector capabilities and available operations
+- API documentation
+
 ---
 
 ## Quick Reference: Connector Capability Matrix
+
+**Common Microsoft & 3rd-party connectors:**
 
 | Connector | Best For | Can Search? | Can Create/Update? | Can Delete? | AI/Semantic? | MCP Server? |
 |-----------|----------|-------------|-------------------|------------|-------------|-----------|
@@ -223,10 +256,22 @@ When the user describes their app goal:
 
 ### **For `/add-connector` (Canonical Skill)**
 
-When called with an `api-id`:
-1. Verify the `api-id` is correct (use `ms connector list --search <term>` if uncertain)
-2. Confirm the mode (action, table, procedure) matches the user's intent
-3. If mode seems wrong, ask: "You're adding [Connector] in [mode] mode. Is that correct?"
+This skill handles ANY connector, including those not listed in this guide. When called:
+
+1. **If a connector name is provided** (e.g., "Salesforce", "Slack"):
+   - Search using `ms connector list --search "<term>"`
+   - Present matching connectors to the user
+   - Ask user to pick one
+
+2. **If an `api-id` is provided** (e.g., `shared_office365`, `shared_teams`):
+   - Verify with `ms connector list-actions --connector <api-id>`
+   - Confirm the mode (action, table, procedure) matches intent
+
+3. **If uncertain about availability**:
+   - Check Power Platform docs: https://learn.microsoft.com/en-us/connectors/
+   - Use `/list-connections` skill to browse available connectors
+
+**This guide covers the most common cases, but `/add-connector` works with any Power Platform connector — not just the 10 listed above.**
 
 ### **For Microsoft Apps Architect Agent**
 
