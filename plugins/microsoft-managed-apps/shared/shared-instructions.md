@@ -82,6 +82,21 @@ Applies to every `/add-*` skill. Covers how the CLI creates/picks connections in
 
 ---
 
+## Connector Decision Guide
+
+**📋 [connector-decision-guide.md](./connector-decision-guide.md)**
+
+Use this guide to intelligently select the right connector(s) for any app scenario. Includes:
+
+- **Connector Capability Matrix** — what each connector can and cannot do
+- **Decision Trees** — by user scenario (search, CRUD, AI, hybrid apps)
+- **Common App Patterns** — pre-built recommendations for typical use cases
+- **Examples** — step-by-step decision process for real scenarios
+
+**All `/add-*` skills and the Architect agent must reference this guide before recommending connectors.**
+
+---
+
 ## Environment Resolution
 
 By default, `ms app create` resolves and uses an environment automatically — pass no environment flags and don't surface the environment concept to the user. The only exception: if the user explicitly provides an environment ID, pass it through as `--environment-id <env-id>`. Never discover or construct one yourself.
