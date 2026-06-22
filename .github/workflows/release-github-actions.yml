@@ -1,0 +1,84 @@
+name: Release github-actions
+
+# Auto-publishes the github-actions/ actions whenever they change on main.
+# On each qualifying push it rebuilds the esbuild bundles, verifies the
+# committed dist/ is up to date, then cuts an immutable vX.Y.Z tag and moves
+# the vX major alias to the same commit so `@vX` consumers get the update.
+#
+# Versioning: MAJOR.MINOR come from github-actions/package.json; PATCH is
+# auto-incremented from the highest existing vMAJOR.MINOR.* tag. To ship a
+# minor/major, bump the version in package.json — the alias (vMAJOR) follows
+# automatically, so a major bump creates a fresh vN alias and leaves older
+# majors untouched.
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'github-actions/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-github-actions
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history + tags needed to compute the next version
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Build action bundles
+        working-directory: github-actions
+        run: |
+          npm ci
+          npm run build
+
+      - name: Verify committed dist/ is up to date
+        run: |
+          if ! git diff --quiet -- github-actions/dist; then
+            echo "::error::github-actions/dist is stale. Run 'npm ci && npm run build' in github-actions/ and commit the result before merging."
+            git --no-pager diff --stat -- github-actions/dist
+            exit 1
+          fi
+
+      - name: Compute next version
+        id: ver
+        run: |
+          VER=$(node -p "require('./github-actions/package.json').version")
+          MAJOR=$(echo "$VER" | cut -d. -f1)
+          MINOR=$(echo "$VER" | cut -d. -f2)
+          git fetch --tags --force
+          LAST=$(git tag -l "v${MAJOR}.${MINOR}.*" | sort -V | tail -1)
+          if [ -z "$LAST" ]; then
+            PATCH=0
+          else
+            PATCH=$(( $(echo "$LAST" | cut -d. -f3) + 1 ))
+          fi
+          NEW="v${MAJOR}.${MINOR}.${PATCH}"
+          ALIAS="v${MAJOR}"
+          echo "new=$NEW"     >> "$GITHUB_OUTPUT"
+          echo "alias=$ALIAS" >> "$GITHUB_OUTPUT"
+          echo "Releasing $NEW (alias $ALIAS) at $GITHUB_SHA"
+
+      - name: Tag and move major alias
+        env:
+          NEW: ${{ steps.ver.outputs.new }}
+          ALIAS: ${{ steps.ver.outputs.alias }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$NEW"    -m "$NEW"             "$GITHUB_SHA"
+          git tag -fa "$ALIAS" -m "$ALIAS -> $NEW"   "$GITHUB_SHA"
+          git push origin "$NEW"
+          git push -f origin "$ALIAS"
+          echo "::notice::Released $NEW; $ALIAS now points at $NEW"
