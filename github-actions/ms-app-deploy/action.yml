@@ -27,7 +27,7 @@
 #   - install-ms-cli has run earlier in the job.
 #   - For repoType:'none' without artifact-path: either `ms-app-pack` ran
 #     earlier (with a prior `npm ci`), OR the CLI will pack internally.
-#   - Tenant admin has enabled `AllowExternalArtifactsDeployment` on the
+#   - Tenant admin has enabled `AllowExternalArtifactDeployment` on the
 #     target environment. Without it, deploy returns a policy error from
 #     the RP. Wiki:
 #     microsoft.ghe.com/bic/Managed-Ops-Internal/blob/main/docs/devops/MAAF/allowExternalArtifactDeployment-powershell.md
