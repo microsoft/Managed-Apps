@@ -49,6 +49,10 @@ jobs:
 
 See each action's `action.yml` for the full input/output reference.
 
+## Architecture
+
+See [Architecture & Flow](.claude/skills/architecture.md) for the end-to-end MAAF lifecycle (one-time setup, local dev, and CI loops), the `ms-app-deploy` sequence with RP rejection points, and the release/versioning flow — all with diagrams.
+
 ## Prerequisites
 
 - A **Service Principal** in Microsoft Entra ID with the right role on your target Power Platform environment (System Administrator + System Customizer for Dataverse-enabled environments; Environment Admin for non-Dataverse environments via the BAP REST API).
