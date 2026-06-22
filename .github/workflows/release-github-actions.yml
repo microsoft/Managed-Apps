@@ -5,11 +5,12 @@ name: Release github-actions
 # committed dist/ is up to date, then cuts an immutable vX.Y.Z tag and moves
 # the vX major alias to the same commit so `@vX` consumers get the update.
 #
-# Versioning: MAJOR.MINOR come from github-actions/package.json; PATCH is
-# auto-incremented from the highest existing vMAJOR.MINOR.* tag. To ship a
-# minor/major, bump the version in package.json — the alias (vMAJOR) follows
-# automatically, so a major bump creates a fresh vN alias and leaves older
-# majors untouched.
+# Versioning: the full version (vMAJOR.MINOR.PATCH) is read straight from
+# github-actions/package.json — package.json is the single source of truth.
+# Bump "version" there in your PR (patch, minor, or major); the workflow tags
+# exactly that version and points the vMAJOR alias at it. A major bump creates
+# a fresh vN alias and leaves older majors untouched. If a tag for the current
+# version already exists, the run fails — that's the signal to bump the version.
 
 on:
   push:
@@ -51,21 +52,18 @@ jobs:
             exit 1
           fi
 
-      - name: Compute next version
+      - name: Resolve version from package.json
         id: ver
         run: |
           VER=$(node -p "require('./github-actions/package.json').version")
           MAJOR=$(echo "$VER" | cut -d. -f1)
-          MINOR=$(echo "$VER" | cut -d. -f2)
-          git fetch --tags --force
-          LAST=$(git tag -l "v${MAJOR}.${MINOR}.*" | sort -V | tail -1)
-          if [ -z "$LAST" ]; then
-            PATCH=0
-          else
-            PATCH=$(( $(echo "$LAST" | cut -d. -f3) + 1 ))
-          fi
-          NEW="v${MAJOR}.${MINOR}.${PATCH}"
+          NEW="v${VER}"
           ALIAS="v${MAJOR}"
+          git fetch --tags --force
+          if git rev-parse -q --verify "refs/tags/${NEW}" >/dev/null; then
+            echo "::error::Tag ${NEW} already exists. Bump \"version\" in github-actions/package.json before merging."
+            exit 1
+          fi
           echo "new=$NEW"     >> "$GITHUB_OUTPUT"
           echo "alias=$ALIAS" >> "$GITHUB_OUTPUT"
           echo "Releasing $NEW (alias $ALIAS) at $GITHUB_SHA"
