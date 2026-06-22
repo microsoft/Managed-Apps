@@ -1,6 +1,6 @@
 # Connector Decision Guide
 
-**Use this guide to select the right connector(s) for user scenarios.** This ensures consistent, intelligent connector recommendations across all `/add-*` skills and the `/add-datasource` router.
+**Use this guide to select the right connector(s) for user scenarios.** This ensures consistent, intelligent connector recommendations across all `/add-*` skills.
 
 > **Note:** This guide covers the most common connectors. There are **1400+ connectors** available across the Microsoft ecosystem (Power Platform, Copilot Studio, Power Automate, Power Apps, Azure Logic Apps). See [Discovering All Available Connectors](#discovering-all-available-connectors) below.
 
@@ -8,7 +8,7 @@
 
 ## Discovering All Available Connectors
 
-The Power Platform has **1400+ connectors**. This guide shows the most common ones, but you can discover others:
+The Microsoft connector catalog has **1400+ connectors**. This guide shows the most common ones, but you can discover others:
 
 ### **Via CLI**
 
@@ -23,10 +23,20 @@ ms connector list-actions --connector shared_office365 --search Mail
 
 ### **Via Plugin Skills**
 
-- **`/add-connector`** — Ask for a keyword ("salesforce", "slack", "jira") and it will search and present options
+- **`/add-connector`** — Generic connector skill. Ask for a keyword ("salesforce", "slack", "jira", "workiq") and it will search, present options, and add the connector.
 - **`/list-connections`** — View connectors already bound to your app, or explore operations on a specific connector
 
-### **Via Power Platform Docs**
+### **Via Specific Skills**
+
+For common connectors, shortcuts exist:
+- **`/add-office365`** — Office 365 Outlook (calendar, email)
+- **`/add-teams`** — Teams messages
+- **`/add-sharepoint`** — SharePoint lists/documents
+- **`/add-dataverse`** — Dataverse tables
+- **`/add-mcscopilot`** — Copilot Studio agents
+- (See full list in `/add-connector` help)
+
+### **Via Microsoft Docs**
 
 Search the [Microsoft connectors documentation](https://learn.microsoft.com/en-us/connectors/) for:
 - Specific services you want to integrate (Salesforce, SAP, Slack, etc.)
@@ -37,22 +47,11 @@ These connectors are shared across Power Platform, Copilot Studio, Power Automat
 
 ---
 
-## Quick Reference: Connector Capability Matrix
+## Connector Reference
 
-**Common Microsoft & 3rd-party connectors:**
+**See `agents/microsoft-apps-architect.md` for the current connector capability matrix** (single source of truth to avoid duplication).
 
-| Connector | Best For | Can Search? | Can Create/Update? | Can Delete? | AI/Semantic? | MCP Server? |
-|-----------|----------|-------------|-------------------|------------|-------------|-----------|
-| **Work IQ** | M365 search, conversational queries | ✅ Yes (semantic) | ❌ No | ❌ No | ✅ Yes | ✅ Yes |
-| **Office 365 Outlook** | Calendar, email, inbox | ⚠️ Limited | ✅ Yes | ✅ Yes | ❌ No | ❌ No |
-| **Teams** | Send/read messages, manage channels | ⚠️ Minimal | ✅ Yes | ✅ Yes | ❌ No | ❌ No |
-| **SharePoint** | Lists, documents, document libraries | ⚠️ Minimal | ✅ Yes | ✅ Yes | ❌ No | ❌ No |
-| **OneDrive** | File management, versioning | ⚠️ Minimal | ✅ Yes (upload) | ✅ Yes | ❌ No | ❌ No |
-| **Excel Online** | Spreadsheet CRUD | ❌ No | ✅ Yes | ✅ Yes | ❌ No | ❌ No |
-| **Azure DevOps** | Work items, builds, pipelines | ⚠️ Limited | ✅ Yes | ✅ Yes | ❌ No | ❌ No |
-| **Dataverse** | Custom business data (structured) | ✅ Yes (OData) | ✅ Yes | ✅ Yes | ❌ No | ❌ No |
-| **Copilot Studio** | Pre-built AI agents | ❌ No | ✅ Invoke | ❌ No | ✅ Yes | ❌ No |
-| **SQL Procedures** | Database operations | ✅ Yes | ✅ Yes | ✅ Yes | ❌ No | ❌ No |
+The matrix shows which connectors can search, create/update, delete, and provide AI capabilities.
 
 ---
 
@@ -62,7 +61,7 @@ These connectors are shared across Power Platform, Copilot Studio, Power Automat
 
 ```
 Does the app need to search across M365 (email, files, calendar, contacts)?
-  ├─ YES, semantic/conversational search → Use Work IQ (`/add-workiq`)
+  ├─ YES, semantic/conversational search → Use Work IQ (`/add-connector`)
   │   Example: "Find all meetings with client XYZ"
   │   Example: "Show emails about project Alpha from last month"
   │
@@ -103,7 +102,7 @@ What kind of AI capability?
   │   Example: "Summarize this meeting transcript"
   │   Example: "Generate action items from notes"
   │
-  ├─ Semantic search, Q&A with citations → Work IQ (`/add-workiq`)
+  ├─ Semantic search, Q&A with citations → Work IQ (`/add-connector`)
   │   Example: "What was decided about budget in past meetings?"
   │   Example: "Show me all discussions about Q3 planning"
   │
@@ -121,10 +120,10 @@ What kind of AI capability?
 Example: "Meeting Insights" app
   ├─ List past meetings (action) → Office365 (`/add-office365`)
   ├─ Fetch transcript/recording details (action) → Teams (`/add-teams`)
-  ├─ Allow "find meetings about topic X" (search) → Work IQ (`/add-workiq`)
+  ├─ Allow "find meetings about topic X" (search) → Work IQ (`/add-connector`)
   └─ Generate summary (AI) → Copilot Studio (`/add-mcscopilot`)
 
-→ Invoke `/add-office365`, `/add-teams`, `/add-workiq`, `/add-mcscopilot` in sequence
+→ Invoke `/add-office365`, `/add-teams`, `/add-connector`, `/add-mcscopilot` in sequence
 ```
 
 **Rule:** When multiple connectors are needed, each handles one responsibility. Invoke in order of dependency (actions first, then searches/AI).
@@ -199,7 +198,7 @@ User Goal: "Build a dashboard showing my tasks and calendar"
 Connectors Recommended:
   1. Office 365 (`/add-office365`) — fetch calendar events
   2. Azure DevOps (`/add-azuredevops`) — fetch work items
-  3. Optional: Work IQ (`/add-workiq`) — allow search/drill-down
+  3. Optional: Work IQ (`/add-connector`) — allow search/drill-down
 ```
 
 ### **Pattern 2: Meeting Insights App**
@@ -210,7 +209,7 @@ Connectors Recommended:
   1. Office 365 (`/add-office365`) — fetch calendar + meeting metadata
   2. Teams (`/add-teams`) — fetch transcripts/recordings
   3. Copilot Studio (`/add-mcscopilot`) — generate summaries
-  4. Optional: Work IQ (`/add-workiq`) — semantic meeting search
+  4. Optional: Work IQ (`/add-connector`) — semantic meeting search
 ```
 
 ### **Pattern 3: Document Search & Management App**
@@ -218,7 +217,7 @@ Connectors Recommended:
 User Goal: "Search company documents and allow downloads"
 
 Connectors Recommended:
-  1. Work IQ (`/add-workiq`) — semantic document search
+  1. Work IQ (`/add-connector`) — semantic document search
   2. SharePoint (`/add-sharepoint`) — manage documents
   3. OneDrive (`/add-onedrive`) — if including personal files
 ```
@@ -240,16 +239,16 @@ User Goal: "Store customer data, fetch emails, track interactions"
 Connectors Recommended:
   1. Dataverse (`/add-dataverse`) — customer records
   2. Office 365 (`/add-office365`) — fetch emails by customer
-  3. Optional: Work IQ (`/add-workiq`) — search customer conversations
+  3. Optional: Work IQ (`/add-connector`) — search customer conversations
 ```
 
 ---
 
 ## Implementation Guidance for Skills
 
-### **For `/add-datasource` (Router Skill)**
+### **For All Skills That Select Connectors**
 
-When the user describes their app goal:
+When the user describes their app goal or data need:
 1. Match against the scenarios above
 2. Apply the decision trees
 3. Recommend ONE primary connector or a SEQUENCE of connectors
@@ -270,10 +269,10 @@ This skill handles ANY connector, including those not listed in this guide. When
    - Confirm the mode (action, table, procedure) matches intent
 
 3. **If uncertain about availability**:
-   - Check Power Platform docs: https://learn.microsoft.com/en-us/connectors/
+   - Check Microsoft connectors documentation: https://learn.microsoft.com/en-us/connectors/
    - Use `/list-connections` skill to browse available connectors
 
-**This guide covers the most common cases, but `/add-connector` works with any Power Platform connector — not just the 10 listed above.**
+**This guide covers the most common cases, but `/add-connector` works with any Microsoft connector — not just the 10 listed above.**
 
 ### **For Microsoft Apps Architect Agent**
 
@@ -281,7 +280,7 @@ When recommending connectors for an app design:
 1. Always start with the user's end goal (not available connectors)
 2. Apply the decision trees to recommend the right connector
 3. If multiple options exist, explain the trade-offs
-4. Include Work IQ in the recommendation if semantic M365 search is valuable
+4. Include Work IQ capabilities in the recommendation if semantic M365 search is valuable
 5. Flag if no connector exists and suggest alternatives
 
 ---
@@ -309,7 +308,7 @@ Decision Process:
   3. Action needed? → NO (search-only)
   4. AI needed? → NO
 
-→ Recommend: `/add-workiq` (then optionally `/add-sharepoint` if file management needed)
+→ Recommend: `/add-connector` (then optionally `/add-sharepoint` if file management needed)
 ```
 
 ### **Example 3: User says "I need to build a system to store customer records and generate AI summaries of their interactions"**
@@ -323,7 +322,7 @@ Decision Process:
 
 → Recommend in sequence:
    - `/add-dataverse` (store customer records)
-   - `/add-copilot-studio` (generate summaries)
+   - `/add-mcscopilot` (generate summaries)
    - Optional: `/add-office365` (if fetching customer emails)
 ```
 
@@ -337,4 +336,4 @@ Add new scenarios when:
 - Trade-offs between connectors change (e.g., new capabilities added)
 - A scenario requires special handling not covered above
 
-Update in `shared/connector-decision-guide.md`, and reference it in `/add-datasource` SKILL.md.
+Update in `shared/connector-decision-guide.md`, and update the reference in `shared/shared-instructions.md` so all skills see the latest guidance.
