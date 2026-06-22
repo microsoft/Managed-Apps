@@ -2,7 +2,7 @@
 
 **Use this guide to select the right connector(s) for user scenarios.** This ensures consistent, intelligent connector recommendations across all `/add-*` skills and the `/add-datasource` router.
 
-> **Note:** This guide covers the most common connectors. There are 1400+ connectors available in Power Platform. See [Discovering All Available Connectors](#discovering-all-available-connectors) below.
+> **Note:** This guide covers the most common connectors. There are **1400+ connectors** available across the Microsoft ecosystem (Power Platform, Copilot Studio, Power Automate, Power Apps, Azure Logic Apps). See [Discovering All Available Connectors](#discovering-all-available-connectors) below.
 
 ---
 
@@ -28,10 +28,12 @@ ms connector list-actions --connector shared_office365 --search Mail
 
 ### **Via Power Platform Docs**
 
-Search the [Power Platform connectors reference](https://learn.microsoft.com/en-us/connectors/) for:
-- Specific services you want to integrate
+Search the [Microsoft connectors documentation](https://learn.microsoft.com/en-us/connectors/) for:
+- Specific services you want to integrate (Salesforce, SAP, Slack, etc.)
 - Connector capabilities and available operations
-- API documentation
+- API documentation and authentication details
+
+These connectors are shared across Power Platform, Copilot Studio, Power Automate, Power Apps, and Azure Logic Apps.
 
 ---
 
