@@ -1,6 +1,6 @@
 {
   "name": "@microsoft/managed-apps-github-actions",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "GitHub Actions for building and deploying Microsoft Managed Apps from CI",
   "main": "index.js",
