@@ -68,8 +68,7 @@ This plugin uses a memory bank (`memory-bank.md`) to persist state across sessio
 | `/add-azuredevops` | Azure DevOps work items / pipelines.                                      |
 | `/add-mcscopilot`  | Microsoft Copilot Studio agents.                                          |
 | `/add-connector`   | Generic fallback for any other connector.                                 |
-| `/add-procedure`   | SQL stored procedures (no equivalent in prior tooling).                   |
-| `/list-connections`| Enumerate connections / bound data sources for discovery.                 |
+| `/list-connectors` | Enumerate connectors / bound data sources for discovery.                  |
 
 ### Workflow
 

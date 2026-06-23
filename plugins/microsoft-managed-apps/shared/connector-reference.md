@@ -2,21 +2,47 @@
 
 Applies to all `/add-*` skills.
 
-## Connections — handled inline by the CLI
+## Connections — created inline by the CLI
 
-When you run `ms app add action --api-id <id>` or `ms app add table --api-id <id> ...`, the CLI:
+There is **no separate "create connection" command**. Connections are created and resolved
+inline by `ms app add connector` (the single add command — there is no `ms app add action` /
+`ms app add table` / `ms app add procedure`):
 
-1. Checks whether the active environment has a connection for that connector.
-2. If it does, prompts you to pick which one (or accepts `--connection-id <id>` non-interactively).
-3. If it doesn't, walks you through creating one inline (OAuth consent flow in a browser).
+```bash
+ms app add connector --connector <api-id> [--as table|action] [--connection-id <id> | -c <id>]
+```
 
-You do NOT need to pre-create connections via the maker portal before running an `/add-*` skill, and you do NOT need to pass `--connection-id` unless you want to bypass the interactive picker.
+When you run it, the CLI resolves a connection for `<api-id>` as follows:
 
-For non-interactive runs (`--non-interactive`), pass `--connection-id` explicitly. Discover connection IDs with `/list-connections`.
+**Interactive (default, a TTY is attached):**
+
+1. Lists the existing connections for that connector in the active environment and adds a
+   `(Create a new connection)` option.
+2. If you pick an existing connection, it's used.
+3. If you pick `(Create a new connection)`:
+   - **SSO-only connectors** (a single SSO-eligible auth type) are created **silently**, with
+     no browser. If silent creation fails, the CLI falls back to the browser flow below.
+   - **All other connectors** open a **browser** OAuth/consent dialog (served by a local
+     callback). On success the new connection's ID is printed and used.
+
+**Non-interactive (`--non-interactive`):** the CLI does **not** open a browser and does **not**
+create a connection. If `--connection-id` / `-c` is omitted, it **first prints a table of the
+available connections** for that connector (Display Name + Connection ID, or
+"No connections found in this environment.") and **then** errors, instructing you to re-run
+with `--connection-id <id>`. Copy a Connection ID from that printed table and pass it
+explicitly. If no connection exists yet, **run the command once interactively** (omit
+`--non-interactive`) so the CLI creates it, then reuse the printed Connection ID.
+
+So interactively you do NOT need to pre-create connections or pass `--connection-id`; you only
+need it to bypass the picker or to script a non-interactive run.
 
 ### Dataverse is different
 
-Dataverse doesn't use the connection-id model — `ms app add table --api-id dataverse --table <name>` resolves the active environment's Dataverse automatically. No `--connection-id` is required (or accepted).
+The tabular Dataverse connector (`--connector dataverse`) doesn't use the connection-id model —
+`ms app add connector --connector dataverse --as table --table <name>` resolves the active
+environment's Dataverse automatically. No `--connection-id` is required (or accepted). (The
+separate `shared_commondataserviceforapps` connector instead pairs `--table` with
+`--dataverse-environment-id`.)
 
 ## Inspecting Large Generated Files
 
