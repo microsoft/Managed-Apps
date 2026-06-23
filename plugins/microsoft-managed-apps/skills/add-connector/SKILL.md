@@ -47,7 +47,7 @@ Additional by mode:
 
 - `table`: `dataset`, `table`
 
-> **SQL stored procedures:** the CLI has no `ms app add procedure` command and `add connector`
+> **SQL stored procedures:** the CLI has no `ms app add procedure` command and `ms app add connector`
 > does not accept `--sql-stored-procedure`. You can still add the SQL connector as a table
 > (`--connector shared_sql --as table --dataset <db> --table <tbl>`), but binding a specific
 > stored procedure is not currently supported.
@@ -109,8 +109,8 @@ for a specific one). In non-interactive mode, if `--connection-id` is omitted th
 available connections and then errors. Dataverse (`--connector dataverse --as table`) needs no
 `--connection-id`. See [connector-reference.md](${CLAUDE_PLUGIN_ROOT}/shared/connector-reference.md).
 
-> **SQL stored procedures** have no `add procedure` command and `--sql-stored-procedure` is not
-> accepted by `add connector`; binding a specific stored procedure is not currently supported.
+> **SQL stored procedures** have no `ms app add procedure` command and `--sql-stored-procedure` is not
+> accepted by `ms app add connector`; binding a specific stored procedure is not currently supported.
 
 ### Step 4: Build
 

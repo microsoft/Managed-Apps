@@ -6,7 +6,7 @@ Applies to all `/add-*` skills.
 
 There is **no separate "create connection" command**. Connections are created and resolved
 inline by `ms app add connector` (the single add command — there is no `ms app add action` /
-`add table` / `add procedure`):
+`ms app add table` / `ms app add procedure`):
 
 ```bash
 ms app add connector --connector <api-id> [--as table|action] [--connection-id <id> | -c <id>]
