@@ -14,7 +14,7 @@ releases the actions themselves. Diagrams are Mermaid (render on GitHub).
 | `ms-app-deploy` action | Wraps `ms app deploy` (build + pack + upload + deploy). |
 | `ms.config.json` | Per-app config (`appId`, `environmentId`, `repoType`) written by `ms app create`. |
 | Power Platform environment | Deploy target; needs `AllowExternalArtifactDeployment` enabled for BYOB (`repoType: none`) deploys. |
-| Release workflow + `/create-pr` | Versions and publishes the actions (this repo). |
+| Release workflow + [release guide](release-guide.md) | Versions and publishes the actions (this repo). |
 
 ## 1. End-to-end activity flow
 
@@ -98,7 +98,7 @@ How a change to the actions becomes a `@v1` update consumers receive.
 
 ```mermaid
 flowchart LR
-    D1["change under github-actions/"] --> D2["/create-pr patch|minor|major"]
+    D1["change under github-actions/"] --> D2["prepare release PR<br/>(bump + changelog + dist)"]
     D2 --> D3["branch from origin/main<br/>bump package.json<br/>update CHANGELOG<br/>rebuild dist"]
     D3 --> D4["open PR to main"]
     D4 --> D5["review + merge"]

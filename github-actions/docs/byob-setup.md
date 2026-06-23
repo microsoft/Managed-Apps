@@ -1,34 +1,28 @@
----
-name: maaf-byob-setup
-description: Step-by-step walkthrough for setting up MAAF Bring-Your-Own-Build (BYOB) deploys via GitHub Actions against a Power Platform environment — covers BOTH Dataverse-enabled and non-Dataverse (DV-free) environments. Includes Service Principal creation, the right per-environment-type permission grant, MAAF app creation, and the GitHub Actions workflow wiring.
-user-invocable: true
-allowed-tools: AskUserQuestion, TodoWrite, Read, Bash
----
-
 # MAAF BYOB → GitHub Actions Setup
 
-Use this skill when a user is setting up a new MAAF Bring-Your-Own-Build (BYOB) deployment pipeline using GitHub Actions.
+A step-by-step walkthrough for setting up a new MAAF Bring-Your-Own-Build (BYOB)
+deployment pipeline using GitHub Actions. It covers both Dataverse-enabled and
+non-Dataverse (DV-free) environments.
 
-## How to drive this skill (instructions to Claude)
+This is a plain runbook. Follow it yourself, or hand it to any coding-agent CLI
+(GitHub Copilot CLI, Claude Code, etc.) to drive interactively — the guidance
+below is written for whoever (person or agent) is driving it.
 
-This is an interactive walkthrough — **not** a doc to dump on the user.
+## How to drive this guide
+
+This is an interactive walkthrough — **not** a doc to dump on the user all at once.
 
 **Pacing rules:**
 
-1. **One question at a time.** Never present multiple prereqs or multiple verification questions in the same turn. After each question, stop and wait for the user's answer.
-2. **Always use the `AskUserQuestion` tool** for each prereq and each step's verification question — never plain text "Yes / No?". The tool gives the user an arrow-key-navigable picker plus an automatic "Other" option where they can type free text. Question structure:
-   - `question`: the binary check phrased as a question (include the one-step way to check it inline)
-   - `header`: short label (e.g. "App reg perm")
-   - `options` array with exactly 2 entries: `{ label: 'Yes', description: 'I can see + New registration' }` and `{ label: 'No', description: "I don't have permission" }`
-   - The Other option is automatic — that's where "Not sure" and custom text land.
-   - `multiSelect: false`
+1. **One question at a time.** Never present multiple prereqs or multiple verification questions at once. After each question, stop and wait for the answer.
+2. **Ask each prereq and verification as a clear Yes/No question** (use your CLI's interactive prompt if it has one). Phrase it as the binary check, and include the one-step way to check it inline. Leave room for a "Not sure" / free-text answer.
 3. **Branch on the answer.**
    - **Yes**: mark that item done, advance to the next prereq/step.
-   - **No**: provide the corrective steps inline (don't just link to docs — give the click path or exact commands), then re-ask via `AskUserQuestion`.
-   - **Other / "Not sure" / unrelated text**: give the user a one-step check (a portal URL, a single CLI command), then re-ask.
-4. **Verify after every step.** Each Step has an explicit "Verification" question — ask it via `AskUserQuestion`, take the binary answer, branch.
+   - **No**: provide the corrective steps inline (don't just link to docs — give the click path or exact commands), then re-ask.
+   - **Not sure / unrelated**: give a one-step check (a portal URL, a single CLI command), then re-ask.
+4. **Verify after every step.** Each Step has an explicit "Verification" question — ask it, take the answer, branch.
 5. **Don't skip ahead.** Even if the user seems competent, run the prereq gate first. Most failures here are prereqs (env settings, role grants).
-6. **Use TodoWrite** to track progress through the 6 prereqs and 7 steps. Update one item to in_progress at a time.
+6. **Track progress** through the 6 prereqs and 7 steps with a checklist; keep one item in progress at a time.
 7. **Keep secrets out of chat.** Never ask the user to paste a client secret, PAT, or JWT into the conversation. Have them paste GUIDs, screenshots, and error messages only.
 
 ## Outcome
@@ -58,7 +52,7 @@ Ask: *"Do you have admin access to the target Power Platform environment? Quick 
 **If No:**
 - The user needs **System Administrator** on the env (for DV) or **Environment Admin** (for non-DV), OR tenant-wide Power Platform Admin.
 - Click path: tenant admin opens https://admin.microsoft.com → **Roles** → **Power Platform Admin** → assign the user.
-- Alternative: existing env admin opens the env in PPAC and adds the user as System Administrator (DV) or runs the BAP API to grant Environment Admin (non-DV — see Step 2b in this skill for the API call shape).
+- Alternative: existing env admin opens the env in PPAC and adds the user as System Administrator (DV) or runs the BAP API to grant Environment Admin (non-DV — see Step 2b in this guide for the API call shape).
 - Then re-ask.
 
 ### Prereq 3 — GitHub repository for the MAAF app
@@ -100,7 +94,7 @@ Ask: *"Is your target environment Dataverse-enabled, or non-DV / DV-free? If you
 - Ask: *"Do you have VS Code with the REST Client extension installed AND the `az` CLI working (`az --version` prints something)?"*
 - **If No:**
   - REST Client: install VS Code → Extensions → search "REST Client" by Huachao Mao → Install.
-  - Alternative: any HTTP client works (curl, Postman, Insomnia, PowerShell `Invoke-RestMethod`). The skill provides a `.http` template optimized for the VS Code REST Client extension.
+  - Alternative: any HTTP client works (curl, Postman, Insomnia, PowerShell `Invoke-RestMethod`). This guide provides a `.http` template optimized for the VS Code REST Client extension.
   - `az` CLI: install from https://learn.microsoft.com/cli/azure/install-azure-cli-windows
   - Re-ask.
 
@@ -273,7 +267,7 @@ Content-Type: application/json
 }
 ```
 
-A copy of this template is at [`assets/grant-spn-environment-admin.http`](assets/grant-spn-environment-admin.http) in this skill — point the user there.
+A copy of this template is at [`assets/grant-spn-environment-admin.http`](assets/grant-spn-environment-admin.http) in this guide — point the user there.
 
 **Expected outcome:** Step A returns the existing role assignments (probably one for the env owner). Step B returns 200 / 201 with a body confirming the new assignment for the SPN.
 
@@ -504,7 +498,7 @@ ms app share <principal-objectId> --access edit
 
 For BYOB apps (`repoType: 'none'`), this grants contributor access **at the app scope** (since there's no platform-managed repository). The CLI surfaces this automatically: `App ... has no platform-managed repository, so granting contributor access at the app scope instead of repository scope.`
 
-## What this skill does NOT cover
+## What this guide does NOT cover
 
 - Federated identity (OIDC) auth — not yet supported by `@microsoft/managed-apps-cli`.
 - Multi-stage promotion (dev → test → prod). Build the basic flow first.
