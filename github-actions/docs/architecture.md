@@ -43,7 +43,7 @@ flowchart TD
         C3 --> C4["install-ms-cli"]
         C4 --> C5["ms-app-deploy"]
         C5 --> C6{"auth identity?"}
-        C6 -- "service principal" --> C7["currently RP-blocked<br/>(ServicePrincipalNotSupportedForMaafOperations)"]
+        C6 -- "service principal<br/>(all 3 inputs)" --> C7["deploys as the SPN<br/>(no developer in the loop)"]
         C6 -- "interactive" --> C8["not available on a runner"]
     end
 
@@ -73,9 +73,7 @@ sequenceDiagram
     CLI->>CLI: npm run build, then pack client output
     CLI->>RP: upload artifact + deploy
     RP->>RP: check AllowExternalArtifactDeployment + identity
-    alt SPN identity
-        RP-->>CLI: ServicePrincipalNotSupportedForMaafOperations
-    else artifact deployment disabled
+    alt artifact deployment disabled
         RP-->>CLI: external artifact deployment not enabled
     else ok
         RP-->>CLI: appId, commit, Play URL
@@ -126,10 +124,11 @@ flowchart LR
   the artifact. No `git init`/remote required.
 - **Cloud target** is set via `MS_CLI_CLOUD_INSTANCE` (tested `preprod`). The
   `ms-app-deploy` action exposes this as the `cloud` input.
-- **Auth:** interactive sign-in (`ms auth login`) works for local dev. Service
-  principal auth is wired in the actions but **currently rejected by the RP** for
-  MAAF operations — so a CI deploy can't authenticate yet. This is a platform
-  limitation, not an action bug.
+- **Auth:** interactive sign-in (`ms auth login`) works for local dev. For CI,
+  supply all three Service Principal inputs (`app-id`, `client-secret`,
+  `tenant-id`) — the actions set `MS_CLI_USE_SP_AUTH` + `MS_CLI_SP_*`, and the RP
+  accepts the SPN for MAAF operations, so the deploy runs with no developer in
+  the loop.
 - **Sharing:** for `repoType: none` apps (no platform-managed repo),
   `ms app share <id> --access edit` grants contributor access at the **app scope**
   rather than the repository scope.

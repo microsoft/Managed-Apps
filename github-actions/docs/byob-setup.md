@@ -301,7 +301,7 @@ ms auth status
 Signed in as Service Principal: <client-id>
 ```
 
-If you get `ServicePrincipalNotSupportedForMaafOperations` or 401: the RP has not enabled SPN for the target ring. Stop and track with the MAAF CLI team.
+If you get a 401 or "not signed in": double-check the three SPN env vars (`MS_CLI_SP_CLIENT_ID`, `MS_CLI_SP_CLIENT_SECRET`, `MS_CLI_SP_TENANT_ID`), `MS_CLI_USE_SP_AUTH=true`, and that the secret value is correct and unexpired.
 
 ---
 
@@ -470,7 +470,6 @@ Commit and push the workflow file.
 |---|---|---|
 | `Service principal environment variables ... must be set` | All three SPN inputs not supplied to a step | Pass `app-id` / `client-secret` / `tenant-id` to **both** `ms-app-pack` and `ms-app-deploy` |
 | `npm error code E401 Incorrect or missing password` | Azure DevOps PAT scope or org mismatch | Action uses public npm by default; if overriding `registry-url` to ADO, PAT must match the feed's org and have **Packaging (Read)** scope |
-| `ServicePrincipalNotSupportedForMaafOperations` | RP rejects SPN identity for MAAF on this ring | RP-side feature gate; track with the MAAF CLI team |
 | **DV env:** `Forbidden — 'Repositories.MicrosoftApps.Deploy.Write'` | SPN added as App User but missing MAAF permission | Re-check Step 2a — both System Administrator AND System Customizer assigned. If still failing, escalate to the MAAF team for role-to-permission clarification |
 | **Non-DV env:** `InvalidDevEnvironmentOperation` or `LinkedEnvironmentForbiddenOperation` from the controller | SPN doesn't have `EnvironmentAdmin` on the env, OR you targeted a DV env and used the non-DV path | Verify with Step 2b's "list role assignments" GET. If the SPN isn't there, retry Step 2b's POST. If the env is DV, switch to Step 2a |
 | **Non-DV env:** 400 "Principal not found" on the `modifyRoleAssignments` POST | Used App Registration's ObjectId instead of Service Principal's ObjectId | Re-read Step 2b.1 — get the SP ObjectId from **Enterprise applications**, not **App registrations** |

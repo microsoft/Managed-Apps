@@ -19950,7 +19950,6 @@ function buildCliEnv(opts) {
     env[CLI_ENV_VARS.spClientSecret] = opts.clientSecret;
     env[CLI_ENV_VARS.spTenantId] = opts.tenantId;
     core.info("Service Principal auth enabled.");
-    core.warning("Note: the Power Apps RP currently rejects SPN identities for MAAF operations. This call will likely fail with ServicePrincipalNotSupportedForMaafOperations until the RP enables SPN or the CLI adds federated auth.");
   } else if (opts.appId || opts.clientSecret || opts.tenantId) {
     core.warning("Partial SPN inputs supplied (need all of app-id, client-secret, tenant-id). Falling back to whatever identity is already cached by the CLI.");
   }

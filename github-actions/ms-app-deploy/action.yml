@@ -33,15 +33,11 @@
 #     microsoft.ghe.com/bic/Managed-Ops-Internal/blob/main/docs/devops/MAAF/allowExternalArtifactDeployment-powershell.md
 #
 # ---------------------------------------------------------------------------
-# KNOWN BLOCKER (as of 2026-05):
-#   The Power Apps RP currently rejects Service Principal identities for MAAF
-#   operations (error: ServicePrincipalNotSupportedForMaafOperations). This
-#   action's auth inputs (`app-id`, `client-secret`, `tenant-id`) are wired
-#   to the CLI's documented SPN env vars, but the server will reject them
-#   until either:
-#     (a) the RP enables SPN for MAAF operations, OR
-#     (b) the CLI adds federated/OIDC auth and the RP accepts it.
-#   Track the ask with the MAAF CLI team (Anshul / Casey).
+# Service Principal auth:
+#   The auth inputs (`app-id`, `client-secret`, `tenant-id`) are wired to the
+#   CLI's SPN env vars (MS_CLI_SP_* + MS_CLI_USE_SP_AUTH). The Power Apps RP
+#   accepts Service Principal identities for MAAF operations. Provide all three
+#   inputs together to deploy as the SPN with no developer in the loop.
 # ---------------------------------------------------------------------------
 #
 # Example 1 — repoType:'none' with locally-built artifact:
@@ -115,7 +111,7 @@ inputs:
     required: false
     default: ''
 
-  # ── Service Principal authentication (optional, currently RP-blocked) ─────
+  # ── Service Principal authentication ──────────────────────────────────────
   # All three must be provided together to enable SPN mode. If any is empty,
   # the action will not set MS_CLI_USE_SP_AUTH and the CLI will fail with a
   # clear "not signed in" error rather than silently using a stale identity.
