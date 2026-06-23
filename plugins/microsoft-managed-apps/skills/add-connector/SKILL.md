@@ -1,6 +1,6 @@
 ---
 name: add-connector
-description: Canonical add flow for Microsoft Managed Apps. Use when adding any connector through `ms app add action`, `ms app add table`, or `ms app add procedure`, or when the user wants help discovering which connector / api-id to use.
+description: Canonical add flow for Microsoft Managed Apps. Use when adding any connector through `ms app add connector` (with `--as table` or `--as action`), or when the user wants help discovering which connector / api-id to use.
 user-invocable: true
 allowed-tools: Read, Edit, Write, Grep, Glob, Bash, AskUserQuestion, Skill
 model: sonnet
@@ -38,14 +38,19 @@ $BIN auth status
 
 Collect:
 
-- `api-id` (required — see resolution order below)
-- `mode` = `action` | `table` | `procedure`
+- `api-id` (required — see resolution order below). Passed to the CLI via `--connector <api-id>`.
+- `mode` = `action` | `table` (controls the `--as` flag). There is **no** `procedure` mode —
+  binding a specific SQL stored procedure is not exposed by the current CLI (see note below).
 - `connection-id` (optional interactive, required for non-interactive where applicable)
 
 Additional by mode:
 
 - `table`: `dataset`, `table`
-- `procedure`: `dataset`, `sql-stored-procedure`
+
+> **SQL stored procedures:** the CLI has no `ms app add procedure` command and `ms app add connector`
+> does not accept `--sql-stored-procedure`. You can still add the SQL connector as a table
+> (`--connector shared_sql --as table --dataset <db> --table <tbl>`), but binding a specific
+> stored procedure is not currently supported.
 
 #### 2a. Resolve `api-id`
 
@@ -76,33 +81,36 @@ For api-ids in the "Common Presets" table, use that table's mode. Otherwise ask 
 
 - "Read or write rows in a tabular store?" → `table`
 - "Trigger an operation (send a message, post a file, list events)?" → `action`
-- "Call a SQL stored procedure?" → `procedure`
+
+`mode` selects the `--as` flag. Tabular connectors (e.g. SharePoint, SQL) support both; in
+non-interactive runs `--as` is **required** for them. Action-only connectors ignore `--as`.
 
 If the caller is a wrapper skill, use wrapper presets as defaults and only ask for missing fields.
 
 ### Step 3: Execute Add Command
 
+All modes use the single `ms app add connector` command; `--as` chooses table vs action. The
+connector is passed via `--connector` (there is **no** `--api-id` flag).
+
 **Action mode**
 
 ```bash
-$BIN app add action --api-id <api-id>
+$BIN app add connector --connector <api-id> --as action
 ```
 
 **Table mode**
 
 ```bash
-$BIN app add table --api-id <api-id> --dataset "<dataset>" --table "<table>"
+$BIN app add connector --connector <api-id> --as table --dataset "<dataset>" --table "<table>"
 ```
 
-**Procedure mode**
+The CLI resolves a connection inline (interactive picker, or `--connection-id <id>` / `-c <id>`
+for a specific one). In non-interactive mode, if `--connection-id` is omitted the CLI prints the
+available connections and then errors. Dataverse (`--connector dataverse --as table`) needs no
+`--connection-id`. See [connector-reference.md](${CLAUDE_PLUGIN_ROOT}/shared/connector-reference.md).
 
-```bash
-$BIN app add procedure \
-  --api-id <api-id> \
-  --connection-id "<connection-id>" \
-  --dataset "<dataset>" \
-  --sql-stored-procedure "<schema.proc>"
-```
+> **SQL stored procedures** have no `ms app add procedure` command and `--sql-stored-procedure` is not
+> accepted by `ms app add connector`; binding a specific stored procedure is not currently supported.
 
 ### Step 4: Build
 
@@ -128,4 +136,3 @@ If `memory-bank.md` exists, record `api-id`, mode, and parameters used.
 | `/add-onedrive`      | `shared_onedriveforbusiness`    | `action`   |
 | `/add-azuredevops`   | `shared_visualstudioteamservices` | `action` |
 | `/add-mcscopilot`    | `microsoftcopilotstudio`        | `action`   |
-| `/add-procedure`     | `shared_sql`                    | `procedure` |

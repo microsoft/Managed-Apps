@@ -100,7 +100,7 @@ await SharePointOnlineService.PatchItem({
 | Error                                             | Cause                                        | Fix                                                                                                |
 | ------------------------------------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | `"Column 'X' does not exist"`                     | Using display name instead of internal name  | Check generated model for actual property name; may need `_x0020_` encoding                        |
-| `"The list 'X' does not exist"`                   | List name doesn't match exactly              | Verify list display name via `ms app list-tables --api-id shared_sharepointonline --dataset "<site-url>"`; names are case-sensitive |
+| `"The list 'X' does not exist"`                   | List name doesn't match exactly              | Verify the list's display name in SharePoint directly (the CLI has no list-tables command); names are case-sensitive |
 | `"Value does not fall within the expected range"` | Invalid choice value or column type mismatch | Verify the exact choice option strings; SharePoint choices are case-sensitive                      |
 | `"Item does not exist"`                           | Using wrong ID format or deleted item        | SharePoint list item IDs are sequential integers, not GUIDs                                        |
 | `"Access denied"`                                 | Insufficient SharePoint permissions          | User needs at least Edit permission on the list                                                    |
@@ -127,7 +127,7 @@ await SharePointOnlineService.PatchItem({
 
 ## Generated Service Patterns
 
-After running `ms app add table --api-id shared_sharepointonline --dataset "<site-url>" --table "<list>"`, the generated `SharePointOnlineService.ts` provides methods that work across all bound lists. The `dataset` (site URL) and `table` (list name) parameters select which list to operate on:
+After running `ms app add connector --connector shared_sharepointonline --as table --dataset "<site-url>" --table "<list>"`, the generated `SharePointOnlineService.ts` provides methods that work across all bound lists. The `dataset` (site URL) and `table` (list name) parameters select which list to operate on:
 
 ```typescript
 import { SharePointOnlineService } from "./SharePointOnlineService";
