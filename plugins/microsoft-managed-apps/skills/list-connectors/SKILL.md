@@ -1,6 +1,6 @@
 ---
-name: list-connections
-description: Lists connectors and connection-bound data sources for a Microsoft App. Use when discovering existing connections before adding data sources.
+name: list-connectors
+description: Lists connectors reachable in the active environment and the connection-bound data sources already wired into a Microsoft App. Use when discovering connectors and their operations before adding data sources.
 user-invocable: true
 allowed-tools: Read, Bash, AskUserQuestion
 model: sonnet
@@ -8,7 +8,7 @@ model: sonnet
 
 **📋 Shared Instructions: [shared-instructions.md](${CLAUDE_PLUGIN_ROOT}/shared/shared-instructions.md)** — Cross-cutting concerns.
 
-# List Connections
+# List Connectors
 
 Two read-only views, depending on what the user is asking:
 
@@ -77,15 +77,19 @@ Output is a list of operation names and their summaries. Use it to confirm an ap
 
 ## When the user wants a connection ID
 
-The MAAF-CLI's add flows create or reuse connections on the fly. You don't need a connection ID to start `/add-*`. Two exceptions:
+The CLI creates or reuses connections **inline** while `ms app add connector` runs — you don't
+need a connection ID to start an `/add-*` skill. Two cases need a bit more care:
 
-- **`--non-interactive`**: when scripting, the CLI can't open a browser to create a connection, so it expects `--connection-id`. Discover one via `ms app show --json` for connections already bound, or via the maker-portal Connections page.
-- **`add procedure` for SQL**: this skill expects an explicit `--connection-id` because each SQL connection points at a different database.
+- **`--non-interactive`**: the CLI can't open a browser or run the SSO flow, so it can't create
+  a connection. It expects `--connection-id`. If you omit it, the CLI **first prints the
+  available connections** for that connector (Display Name + Connection ID) and **then** errors —
+  copy a Connection ID from that table, or discover one via `ms app show --json` (connections
+  already bound to the app). If **no** connection exists yet, **run the command once in
+  interactive mode** (omit `--non-interactive`) so the CLI creates it inline, then reuse the
+  printed Connection ID for subsequent scripted runs.
+- **SQL (`shared_sql`)**: each SQL connection points at a different database, so when scripting
+  non-interactively pass the `--connection-id` for the right database explicitly.
 
-When a connection ID is required and the user doesn't have one, direct them to:
-
-```
-https://make.powerapps.com/environments/<env-id>/connections
-```
-
-The maker portal handles consent + sign-in for the connector; the connection appears in the list after a refresh.
+To **create** a connection that doesn't exist yet, just run `ms app add connector` interactively:
+the CLI handles consent + sign-in (silent SSO, or a browser dialog), creates the connection,
+prints its Connection ID, and binds it — no maker portal needed.
