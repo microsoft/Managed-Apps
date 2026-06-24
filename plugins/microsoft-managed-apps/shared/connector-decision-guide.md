@@ -270,7 +270,7 @@ This skill handles ANY connector, including those not listed in this guide. When
 
 3. **If uncertain about availability**:
    - Check Microsoft connectors documentation: https://learn.microsoft.com/en-us/connectors/
-   - Use `/list-connections` skill to browse available connectors
+   - Use `/list-connectors` skill to browse available connectors
 
 **This guide covers the most common cases, but `/add-data-source` works with any Microsoft connector — not just the 10 listed above.**
 
