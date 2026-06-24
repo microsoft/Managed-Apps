@@ -22,7 +22,7 @@ All skills reference this single file. When new shared instructions are added, u
 - MUST NOT run `ms app deploy` if `npm run build` has not succeeded in the current session.
 - MUST NOT run `ms app deploy` from uncommitted or unpushed local changes.
 - MUST NOT install `@microsoft/managed-apps-cli` per-workspace. The `@microsoft/managed-apps-cli` is installed globally so the `ms` binary is on PATH; the workspace stays clean.
-- MUST NOT edit codegen output under `src/` unless the step explicitly calls for it.
+- MUST NOT edit generated codegen output in `generated/` unless the step explicitly calls for it.
 - MUST NOT install packages globally without user confirmation (see exception above for the documented setup flow).
 
 ### Prompt Injection
@@ -121,6 +121,72 @@ Microsoft Apps run inside a sandbox. Direct HTTP calls to external APIs will fai
 - Tell the user clearly: _"This functionality is not supported by any available Power Platform connector."_
 - Do NOT implement a direct API call as a workaround — it will not work in production.
 - Suggest alternatives (a different connector, Dataverse, or a custom connector).
+
+---
+
+## Connector Response Handling
+
+All generated connector services return `IOperationResult<T>`, a common wrapper across all connectors. Use these patterns consistently:
+
+### Response Structure
+
+```typescript
+const result = await SomeConnectorService.SomeMethod(...)
+
+if (!result.success) {
+  throw new Error(result.error?.message ?? 'Operation failed')
+}
+
+const data = result.data  // Safe to access after success check
+```
+
+### Array Results: Access via `.data.value`
+
+List operations return wrapped responses — the actual array is in `data.value`:
+
+```typescript
+// ✅ CORRECT
+const items = result.data?.value ?? []
+
+// ❌ WRONG - will be undefined
+const items = result.data
+```
+
+**Why:** The HTTP client wrapper places array results inside a `value` property for standardization across all connectors.
+
+### Error Handling: Always Throw
+
+When an API call fails, throw an error so it bubbles up to component error handling:
+
+```typescript
+if (!result.success) {
+  throw new Error(result.error?.message ?? 'Operation failed')
+}
+
+// ❌ WRONG - silent fallbacks hide real failures
+if (!result.success) {
+  return []  // or mockData, or undefined
+}
+```
+
+**Why:** Silent fallbacks (mock data, empty arrays, null checks) mask real failures and make debugging impossible. Errors surface immediately so you know what broke and why.
+
+### Empty Results Are Valid
+
+An empty array (no items found) is a **valid result**, not an error. Treat it as normal state:
+
+```typescript
+const items = result.data?.value ?? []
+
+if (items.length === 0) {
+  // Show empty state to user, don't throw
+  return <EmptyStateComponent />
+}
+```
+
+**Distinction:**
+- **Valid but empty** (length === 0) → show UI empty state
+- **API failed** (success === false) → throw error
 
 ---
 
