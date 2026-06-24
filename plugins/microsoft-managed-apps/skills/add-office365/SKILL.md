@@ -40,7 +40,7 @@ After the connector is added, you'll have access to `Office365OutlookService` wi
 **Pattern:**
 
 ```typescript
-import { Office365OutlookService } from '@generated/services/Office365OutlookService'
+import { Office365OutlookService } from '../../generated/services/Office365OutlookService'
 
 // Step 1: Discover calendar ID (validate and prefer primary calendar)
 const calendarsResult = await Office365OutlookService.CalendarGetTables()

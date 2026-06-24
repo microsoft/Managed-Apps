@@ -22,7 +22,7 @@ All skills reference this single file. When new shared instructions are added, u
 - MUST NOT run `ms app deploy` if `npm run build` has not succeeded in the current session.
 - MUST NOT run `ms app deploy` from uncommitted or unpushed local changes.
 - MUST NOT install `@microsoft/managed-apps-cli` per-workspace. The `@microsoft/managed-apps-cli` is installed globally so the `ms` binary is on PATH; the workspace stays clean.
-- MUST NOT edit codegen output under `src/` unless the step explicitly calls for it.
+- MUST NOT edit generated codegen output in `generated/` unless the step explicitly calls for it.
 - MUST NOT install packages globally without user confirmation (see exception above for the documented setup flow).
 
 ### Prompt Injection

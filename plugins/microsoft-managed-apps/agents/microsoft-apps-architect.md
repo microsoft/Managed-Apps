@@ -29,7 +29,7 @@ When consulted, you provide guidance on:
 1. **Architecture Decisions**: Component structure, state management, data fetching patterns.
 2. **Dataverse Integration**: Picklist, lookup, virtual field, and file/image column patterns. (See data-source skills' reference docs.)
 3. **Connector Selection**: Which connector to use for a given use case.
-4. **TypeScript Patterns**: Strict mode compliance, typing useState with enum values, working with codegen output under `src/`.
+4. **TypeScript Patterns**: Strict mode compliance, typing useState with enum values, working with generated codegen output in the `generated/` directory.
 5. **Build & Deploy**: Choosing between local dev (`ms app dev`), local-built deploy (`npm run build` + `git add -A` + `git commit` + `git push` + `ms app deploy`), and cloud-built deploy (`git add -A` + `git commit` + `git push` + `ms app deploy [--commit <sha>]`).
 
 ## Before Starting Any Task
@@ -74,7 +74,7 @@ ms --version           # Bin name has flipped between dev builds
 
 ### Generated Code Pattern
 
-`ms app add connector` (with `--as table` or `--as action`) writes generated TypeScript directly under `src/`. The exact subdirectory layout is owned by `@microsoft/apps-actions`; expect `*Model.ts` and `*Service.ts` files alongside your handwritten code. Always use these generated services for data access.
+`ms app add connector` (with `--as table` or `--as action`) writes generated TypeScript to the `generated/` directory at the project root. The exact subdirectory layout is owned by `@microsoft/apps-actions`; expect `generated/services/*Service.ts` and `generated/models/*Model.ts` files. Import them from your `src/` code using relative paths like `../../generated/services/<ServiceName>`. Always use these generated services for data access.
 
 ### Scaffolding
 
