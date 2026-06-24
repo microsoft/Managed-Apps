@@ -14,7 +14,15 @@ model: sonnet
 
 This is the **single implementation** for all connector-binding skills.
 
-Specialized `/add-*` skills are thin wrappers that call this skill with presets. If this skill is called from a wrapper, **do not delegate back**.
+Specialized `/add-*` skills are thin wrappers that call this skill with presets. If this skill is called from a wrapper, **do not delegate back**. 
+
+**Important:** After this skill completes, the developer should refer to the specialized skill's documentation (e.g., `/add-office365`, `/add-workiq`) for:
+- Correct import paths for generated services
+- Best practices for using the connector
+- Common patterns and implementation examples
+- Error handling guidance
+
+This ensures developers have complete context for implementing the feature, not just adding the connector.
 
 ## Workflow
 

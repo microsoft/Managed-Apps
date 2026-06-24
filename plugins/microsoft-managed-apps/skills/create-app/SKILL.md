@@ -199,7 +199,11 @@ For Work IQ knowledge/search scenarios, prefer `/add-workiq` (maps to `shared_a3
 
 Run them sequentially. After each one:
 
-- Confirm the typed services were generated under `generated/` at the project root (the add-skills regenerate TypeScript clients). Import paths use `../../generated/services/<ServiceName>` from `src/`.
+- Confirm the typed services were generated under `generated/` at the project root. The add-* skills regenerate TypeScript clients.
+- **For implementation guidance**, refer to the specialized skill's documentation:
+  - `/add-office365` → See "Office 365 Connector: Method Selection Guide" for correct import paths, calendar discovery, and API patterns
+  - `/add-workiq` → See "Work IQ Integration: MCP Session Pattern" for session management and response parsing
+  - Other `/add-*` skills have similar guidance
 - Capture the connection ID + service path so Step 9 can import them.
 
 **Forward all captured context to each sub-skill so its own gather-info prompts are suppressed.** The per-service skills (`/add-dataverse`, `/add-sharepoint`, etc.) and `/add-connector` each have their own prompt sequences (pick connection, pick table/list/site, choose api-id, etc.). The plan you got the user to approve in Step 4 already contains those answers, so pass them through as `$ARGUMENTS` (or whatever invocation surface is available) when dispatching: api-id, connection ID or name, table/list/site identifiers, environment URL, and the project root. If a sub-skill still needs an input you didn't capture, that's a Step 4 gap — go back and ask the user once, then update the plan, rather than letting the sub-skill ask interactively.

@@ -40,18 +40,43 @@ After the connector is added, you'll have access to `Office365OutlookService` wi
 **Pattern:**
 
 ```typescript
-import { Office365OutlookService } from '../generated'
+import { Office365OutlookService } from '@generated/services/Office365OutlookService'
 
-// Step 1: Discover calendar ID
+// Step 1: Discover calendar ID (validate and prefer primary calendar)
 const calendarsResult = await Office365OutlookService.CalendarGetTables()
-const calendarId = calendarsResult.data?.value?.[0]?.Name ?? 'Calendar'
+if (!calendarsResult.success) {
+  throw new Error(calendarsResult.error?.message ?? 'Failed to list calendars')
+}
 
-// Step 2: Query events
+const calendars = calendarsResult.data?.value ?? []
+if (calendars.length === 0) {
+  throw new Error('No calendars found in Office 365 connection')
+}
+
+// Prefer primary 'calendar' (by DisplayName), fall back to first
+const defaultCalendar =
+  calendars.find((c: any) => (c.DisplayName ?? '').toLowerCase() === 'calendar') 
+  ?? calendars[0]
+const calendarId = defaultCalendar?.Name ?? calendars[0]?.Name
+
+if (!calendarId) {
+  throw new Error('Could not determine calendar ID from response')
+}
+
+// Step 2: Query events with pagination
 const eventsResult = await Office365OutlookService.GetEventsCalendarViewV2(
   calendarId,
   startDate.toISOString(),
-  endDate.toISOString()
+  endDate.toISOString(),
+  undefined,        // filter (optional)
+  undefined,        // select (optional)
+  200,              // top - results per page
+  0                 // skip - pagination offset
 )
+
+if (!eventsResult.success) {
+  throw new Error(eventsResult.error?.message ?? 'Failed to fetch events')
+}
 
 const meetings = eventsResult.data?.value ?? []
 ```
@@ -168,3 +193,41 @@ Empty array (no emails/events) is a valid result, not an error. Show empty state
 **5. Surface errors by throwing**
 
 When API fails, throw an error so it bubbles up to component error handling. Don't silently use mock data.
+
+---
+
+## Calendar ID Discovery - CRITICAL
+
+**⚠️ NEVER use hardcoded `'Calendar'` as calendar ID.** Always discover from the user's actual calendars.
+
+```typescript
+// ❌ BROKEN - Will fail for users whose primary calendar isn't named 'Calendar'
+const calendarId = 'Calendar'
+
+// ✅ CORRECT - Discover actual calendar IDs
+const calendarsResult = await Office365OutlookService.CalendarGetTables()
+const calendars = calendarsResult.data?.value ?? []
+
+// Validate calendars exist
+if (calendars.length === 0) {
+  throw new Error('No calendars found')
+}
+
+// Prefer primary calendar by DisplayName, otherwise use first
+const primaryCalendar =
+  calendars.find((c: any) => (c.DisplayName ?? '').toLowerCase() === 'calendar')
+  ?? calendars[0]
+
+// Extract the actual calendar ID from response
+const calendarId = primaryCalendar?.Name
+
+if (!calendarId) {
+  throw new Error('Could not extract calendar ID from Office 365 response')
+}
+```
+
+**Why this matters:**
+- Users may have multiple calendars (shared calendars, project calendars, etc.)
+- The primary calendar's internal ID is not always the string `"Calendar"`
+- Hardcoding causes failures for any user without a calendar literally named `"Calendar"`
+- Must validate response contains valid data before proceeding
