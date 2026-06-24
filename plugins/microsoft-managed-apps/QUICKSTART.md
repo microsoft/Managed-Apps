@@ -79,9 +79,9 @@ Your copilot will recommend data sources based on what your app needs to do. To 
 | Send Teams messages                  | `/add-teams`       |
 | Query Azure DevOps work items        | `/add-azuredevops` |
 | Invoke a Copilot Studio agent        | `/add-mcscopilot`  |
-| Something else (any other connector) | `/add-connector`   |
+| Something else (any other connector) | `/add-data-source`   |
 
-Each command runs `ms app add connector --connector <api-id>` against the right connector, regenerates typed TypeScript services under `src/`, and verifies the build. Your local `ms app dev` hot-reloads the new services.
+Each command runs `ms app add data-source --connector <api-id>` against the right connector, regenerates typed TypeScript services under `src/`, and verifies the build. Your local `ms app dev` hot-reloads the new services.
 
 ### Ship to the Cloud
 
