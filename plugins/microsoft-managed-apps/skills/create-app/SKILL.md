@@ -192,8 +192,10 @@ Detect the trap by matching `Authentication failed for 'https://...d.environment
 
 For every connector identified in Step 3 / Step 4, invoke the matching skill **now**, in this session, before any UI code is generated:
 
-- A specific `/add-*` skill when one exists (`/add-dataverse`, `/add-sharepoint`, `/add-excel`, `/add-office365`, `/add-teams`, `/add-onedrive`, `/add-azuredevops`, `/add-mcscopilot`).
+- A specific `/add-*` skill when one exists (`/add-dataverse`, `/add-sharepoint`, `/add-excel`, `/add-office365`, `/add-teams`, `/add-onedrive`, `/add-azuredevops`, `/add-mcscopilot`, `/add-workiq`).
 - `/add-connector` (with api-id) for anything else.
+
+For Work IQ knowledge/search scenarios, prefer `/add-workiq` (maps to `shared_a365copilotchatmcp`) over generic `/add-connector`.
 
 Run them sequentially. After each one:
 

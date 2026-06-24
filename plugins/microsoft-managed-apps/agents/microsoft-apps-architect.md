@@ -66,6 +66,7 @@ ms --version           # Bin name has flipped between dev builds
 | Upload, download, or manage files                    | OneDrive (`/add-onedrive`)            | File versioning and management |
 | Read lists or manage documents in SharePoint         | SharePoint (`/add-sharepoint`)        | Direct list/document operations |
 | Send emails, read inbox, manage calendar             | Office 365 Outlook (`/add-office365`) | Native calendar API with CRUD |
+| Search M365 knowledge-grounded content               | Work IQ (`/add-workiq`)               | Semantic cross-M365 search/chat |
 | Invoke a Copilot Studio agent                        | MCS Copilot (`/add-mcscopilot`)       | Agent invocation |
 | Connect to any other service                         | Generic (`/add-connector`)            | Fallback for unlisted connectors |
 

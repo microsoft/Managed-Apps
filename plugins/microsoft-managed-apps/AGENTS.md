@@ -67,6 +67,7 @@ This plugin uses a memory bank (`memory-bank.md`) to persist state across sessio
 | `/add-onedrive`    | OneDrive for Business files.                                              |
 | `/add-azuredevops` | Azure DevOps work items / pipelines.                                      |
 | `/add-mcscopilot`  | Microsoft Copilot Studio agents.                                          |
+| `/add-workiq`      | Work IQ Copilot MCP for Microsoft 365 knowledge-grounded search/chat.     |
 | `/add-connector`   | Generic fallback for any other connector.                                 |
 | `/list-connectors` | Enumerate connectors / bound data sources for discovery.                  |
 

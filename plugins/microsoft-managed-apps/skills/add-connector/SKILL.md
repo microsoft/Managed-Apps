@@ -75,6 +75,15 @@ Try sources in this order; stop at the first one that yields a value:
 
 5. **Validation.** Once an api-id is chosen, confirm it's real before spending a build cycle on it: `$BIN connector list-actions --connector <api-id> --search ""` should succeed. If the CLI replies that the api-id is unknown, drop back to step 4 — don't keep retrying with the same value.
 
+#### Work IQ intent hint
+
+When user intent is about **knowledge retrieval / grounded Microsoft 365 search summaries** (for example: "find what Copilot knows", "search M365 content", "knowledge-specific Work IQ"), default to:
+
+- `api-id`: `shared_a365copilotchatmcp`
+- `mode`: `action`
+
+Use workload-specific Work IQ connectors only when the user explicitly asks for that workload (mail/calendar/teams/word/user operations).
+
 #### 2b. Resolve `mode`
 
 For api-ids in the "Common Presets" table, use that table's mode. Otherwise ask the user one question, framed by what they want to do:
@@ -136,3 +145,4 @@ If `memory-bank.md` exists, record `api-id`, mode, and parameters used.
 | `/add-onedrive`      | `shared_onedriveforbusiness`    | `action`   |
 | `/add-azuredevops`   | `shared_visualstudioteamservices` | `action` |
 | `/add-mcscopilot`    | `microsoftcopilotstudio`        | `action`   |
+| `/add-workiq`        | `shared_a365copilotchatmcp`     | `action`   |
