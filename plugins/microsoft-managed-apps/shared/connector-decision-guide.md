@@ -24,7 +24,7 @@ ms connector list-actions --connector shared_office365 --search Mail
 ### **Via Plugin Skills**
 
 - **`/add-data-source`** — Generic connector skill. Ask for a keyword ("salesforce", "slack", "jira", "workiq") and it will search, present options, and add the connector.
-- **`/list-connections`** — View connectors already bound to your app, or explore operations on a specific connector
+- **`/list-connectors`** — View available connectors and whether they are blocked or allowed by your organization
 
 ### **Via Specific Skills**
 
