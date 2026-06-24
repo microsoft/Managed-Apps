@@ -77,7 +77,7 @@ Output is a list of operation names and their summaries. Use it to confirm an ap
 
 ## When the user wants a connection ID
 
-The CLI creates or reuses connections **inline** while `ms app add connector` runs — you don't
+The CLI creates or reuses connections **inline** while `ms app add data-source` runs — you don't
 need a connection ID to start an `/add-*` skill. Two cases need a bit more care:
 
 - **`--non-interactive`**: the CLI can't open a browser or run the SSO flow, so it can't create
@@ -90,6 +90,6 @@ need a connection ID to start an `/add-*` skill. Two cases need a bit more care:
 - **SQL (`shared_sql`)**: each SQL connection points at a different database, so when scripting
   non-interactively pass the `--connection-id` for the right database explicitly.
 
-To **create** a connection that doesn't exist yet, just run `ms app add connector` interactively:
+To **create** a connection that doesn't exist yet, just run `ms app add data-source` interactively:
 the CLI handles consent + sign-in (silent SSO, or a browser dialog), creates the connection,
 prints its Connection ID, and binds it — no maker portal needed.

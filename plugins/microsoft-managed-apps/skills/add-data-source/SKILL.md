@@ -1,6 +1,6 @@
 ---
-name: add-connector
-description: Canonical add flow for Microsoft Managed Apps. Use when adding any connector through `ms app add connector` (with `--as table` or `--as action`), or when the user wants help discovering which connector / api-id to use.
+name: add-data-source
+description: Canonical add flow for Microsoft Managed Apps. Use when adding any data source through `ms app add data-source` (with `--as table` or `--as action`), or when the user wants help discovering which connector / api-id to use.
 user-invocable: true
 allowed-tools: Read, Edit, Write, Grep, Glob, Bash, AskUserQuestion, Skill
 model: sonnet
@@ -10,7 +10,7 @@ model: sonnet
 
 **Reference:** [connector-reference.md](${CLAUDE_PLUGIN_ROOT}/shared/connector-reference.md) — Inline connection creation, Grep-first for large generated files.
 
-# Add Connector (Canonical)
+# Add Data Source (Canonical)
 
 This is the **single implementation** for all connector-binding skills.
 
@@ -47,8 +47,8 @@ Additional by mode:
 
 - `table`: `dataset`, `table`
 
-> **SQL stored procedures:** the CLI has no `ms app add procedure` command and `ms app add connector`
-> does not accept `--sql-stored-procedure`. You can still add the SQL connector as a table
+> **SQL stored procedures:** the CLI has no `ms app add procedure` command and `ms app add data-source`
+> does not accept `--sql-stored-procedure`. You can still add the SQL data source as a table
 > (`--connector shared_sql --as table --dataset <db> --table <tbl>`), but binding a specific
 > stored procedure is not currently supported.
 
@@ -89,19 +89,22 @@ If the caller is a wrapper skill, use wrapper presets as defaults and only ask f
 
 ### Step 3: Execute Add Command
 
-All modes use the single `ms app add connector` command; `--as` chooses table vs action. The
+All modes use the single `ms app add data-source` command; `--as` chooses table vs action. The
 connector is passed via `--connector` (there is **no** `--api-id` flag).
+
+> **Deprecated alias:** `ms app add connector` still works but is **deprecated** — prefer
+> `ms app add data-source`. Both share the same handler and flags.
 
 **Action mode**
 
 ```bash
-$BIN app add connector --connector <api-id> --as action
+$BIN app add data-source --connector <api-id> --as action
 ```
 
 **Table mode**
 
 ```bash
-$BIN app add connector --connector <api-id> --as table --dataset "<dataset>" --table "<table>"
+$BIN app add data-source --connector <api-id> --as table --dataset "<dataset>" --table "<table>"
 ```
 
 The CLI resolves a connection inline (interactive picker, or `--connection-id <id>` / `-c <id>`
@@ -110,7 +113,7 @@ available connections and then errors. Dataverse (`--connector dataverse --as ta
 `--connection-id`. See [connector-reference.md](${CLAUDE_PLUGIN_ROOT}/shared/connector-reference.md).
 
 > **SQL stored procedures** have no `ms app add procedure` command and `--sql-stored-procedure` is not
-> accepted by `ms app add connector`; binding a specific stored procedure is not currently supported.
+> accepted by `ms app add data-source`; binding a specific stored procedure is not currently supported.
 
 ### Step 4: Build
 

@@ -23,7 +23,7 @@ ms connector list-actions --connector shared_office365 --search Mail
 
 ### **Via Plugin Skills**
 
-- **`/add-connector`** — Generic connector skill. Ask for a keyword ("salesforce", "slack", "jira", "workiq") and it will search, present options, and add the connector.
+- **`/add-data-source`** — Generic connector skill. Ask for a keyword ("salesforce", "slack", "jira", "workiq") and it will search, present options, and add the connector.
 - **`/list-connections`** — View connectors already bound to your app, or explore operations on a specific connector
 
 ### **Via Specific Skills**
@@ -34,7 +34,7 @@ For common connectors, shortcuts exist:
 - **`/add-sharepoint`** — SharePoint lists/documents
 - **`/add-dataverse`** — Dataverse tables
 - **`/add-mcscopilot`** — Copilot Studio agents
-- (See full list in `/add-connector` help)
+- (See full list in `/add-data-source` help)
 
 ### **Via Microsoft Docs**
 
@@ -61,7 +61,7 @@ The matrix shows which connectors can search, create/update, delete, and provide
 
 ```
 Does the app need to search across M365 (email, files, calendar, contacts)?
-  ├─ YES, semantic/conversational search → Use Work IQ (`/add-connector`)
+  ├─ YES, semantic/conversational search → Use Work IQ (`/add-data-source`)
   │   Example: "Find all meetings with client XYZ"
   │   Example: "Show emails about project Alpha from last month"
   │
@@ -102,7 +102,7 @@ What kind of AI capability?
   │   Example: "Summarize this meeting transcript"
   │   Example: "Generate action items from notes"
   │
-  ├─ Semantic search, Q&A with citations → Work IQ (`/add-connector`)
+  ├─ Semantic search, Q&A with citations → Work IQ (`/add-data-source`)
   │   Example: "What was decided about budget in past meetings?"
   │   Example: "Show me all discussions about Q3 planning"
   │
@@ -120,10 +120,10 @@ What kind of AI capability?
 Example: "Meeting Insights" app
   ├─ List past meetings (action) → Office365 (`/add-office365`)
   ├─ Fetch transcript/recording details (action) → Teams (`/add-teams`)
-  ├─ Allow "find meetings about topic X" (search) → Work IQ (`/add-connector`)
+  ├─ Allow "find meetings about topic X" (search) → Work IQ (`/add-data-source`)
   └─ Generate summary (AI) → Copilot Studio (`/add-mcscopilot`)
 
-→ Invoke `/add-office365`, `/add-teams`, `/add-connector`, `/add-mcscopilot` in sequence
+→ Invoke `/add-office365`, `/add-teams`, `/add-data-source`, `/add-mcscopilot` in sequence
 ```
 
 **Rule:** When multiple connectors are needed, each handles one responsibility. Invoke in order of dependency (actions first, then searches/AI).
@@ -198,7 +198,7 @@ User Goal: "Build a dashboard showing my tasks and calendar"
 Connectors Recommended:
   1. Office 365 (`/add-office365`) — fetch calendar events
   2. Azure DevOps (`/add-azuredevops`) — fetch work items
-  3. Optional: Work IQ (`/add-connector`) — allow search/drill-down
+  3. Optional: Work IQ (`/add-data-source`) — allow search/drill-down
 ```
 
 ### **Pattern 2: Meeting Insights App**
@@ -209,7 +209,7 @@ Connectors Recommended:
   1. Office 365 (`/add-office365`) — fetch calendar + meeting metadata
   2. Teams (`/add-teams`) — fetch transcripts/recordings
   3. Copilot Studio (`/add-mcscopilot`) — generate summaries
-  4. Optional: Work IQ (`/add-connector`) — semantic meeting search
+  4. Optional: Work IQ (`/add-data-source`) — semantic meeting search
 ```
 
 ### **Pattern 3: Document Search & Management App**
@@ -217,7 +217,7 @@ Connectors Recommended:
 User Goal: "Search company documents and allow downloads"
 
 Connectors Recommended:
-  1. Work IQ (`/add-connector`) — semantic document search
+  1. Work IQ (`/add-data-source`) — semantic document search
   2. SharePoint (`/add-sharepoint`) — manage documents
   3. OneDrive (`/add-onedrive`) — if including personal files
 ```
@@ -239,7 +239,7 @@ User Goal: "Store customer data, fetch emails, track interactions"
 Connectors Recommended:
   1. Dataverse (`/add-dataverse`) — customer records
   2. Office 365 (`/add-office365`) — fetch emails by customer
-  3. Optional: Work IQ (`/add-connector`) — search customer conversations
+  3. Optional: Work IQ (`/add-data-source`) — search customer conversations
 ```
 
 ---
@@ -255,7 +255,7 @@ When the user describes their app goal or data need:
 4. Explain why each is chosen (reference the rules above)
 5. Invoke the appropriate `/add-*` skills in order
 
-### **For `/add-connector` (Canonical Skill)**
+### **For `/add-data-source` (Canonical Skill)**
 
 This skill handles ANY connector, including those not listed in this guide. When called:
 
@@ -272,7 +272,7 @@ This skill handles ANY connector, including those not listed in this guide. When
    - Check Microsoft connectors documentation: https://learn.microsoft.com/en-us/connectors/
    - Use `/list-connections` skill to browse available connectors
 
-**This guide covers the most common cases, but `/add-connector` works with any Microsoft connector — not just the 10 listed above.**
+**This guide covers the most common cases, but `/add-data-source` works with any Microsoft connector — not just the 10 listed above.**
 
 ### **For Microsoft Apps Architect Agent**
 
@@ -308,7 +308,7 @@ Decision Process:
   3. Action needed? → NO (search-only)
   4. AI needed? → NO
 
-→ Recommend: `/add-connector` (then optionally `/add-sharepoint` if file management needed)
+→ Recommend: `/add-data-source` (then optionally `/add-sharepoint` if file management needed)
 ```
 
 ### **Example 3: User says "I need to build a system to store customer records and generate AI summaries of their interactions"**

@@ -67,13 +67,13 @@ ms --version           # Bin name has flipped between dev builds
 | Read lists or manage documents in SharePoint         | SharePoint (`/add-sharepoint`)        | Direct list/document operations |
 | Send emails, read inbox, manage calendar             | Office 365 Outlook (`/add-office365`) | Native calendar API with CRUD |
 | Invoke a Copilot Studio agent                        | MCS Copilot (`/add-mcscopilot`)       | Agent invocation |
-| Connect to any other service                         | Generic (`/add-connector`)            | Fallback for unlisted connectors |
+| Connect to any other service                         | Generic (`/add-data-source`)            | Fallback for unlisted connectors |
 
 **See** [Connector Decision Guide](../shared/connector-decision-guide.md) for decision trees, common app patterns, and scenario examples.
 
 ### Generated Code Pattern
 
-`ms app add connector` (with `--as table` or `--as action`) writes generated TypeScript directly under `src/`. The exact subdirectory layout is owned by `@microsoft/apps-actions`; expect `*Model.ts` and `*Service.ts` files alongside your handwritten code. Always use these generated services for data access.
+`ms app add data-source` (with `--as table` or `--as action`) writes generated TypeScript directly under `src/`. The exact subdirectory layout is owned by `@microsoft/apps-actions`; expect `*Model.ts` and `*Service.ts` files alongside your handwritten code. Always use these generated services for data access.
 
 ### Scaffolding
 
