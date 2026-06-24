@@ -49,11 +49,13 @@ jobs:
 
 See each action's `action.yml` for the full input/output reference.
 
-## Docs
+## Agent skills
 
-- [Architecture & Flow](docs/architecture.md) — the end-to-end MAAF lifecycle (setup, local dev, CI loops), the `ms-app-deploy` sequence with RP rejection points, and the release/versioning flow, with diagrams.
-- [BYOB setup walkthrough](docs/byob-setup.md) — step-by-step guide to standing up a BYOB deploy pipeline (service principal, per-environment permission grant, app creation, workflow wiring).
-- [Release guide](docs/release-guide.md) — how to cut a release PR (version bump + changelog + dist rebuild).
+Step-by-step guides any operator — or coding-agent CLI (GitHub Copilot CLI, Claude Code, etc.) — can follow. See [`AGENTS.md`](AGENTS.md) for the index.
+
+- [Architecture & Flow](agent-skills/architecture.md) — the end-to-end MAAF lifecycle (setup, local dev, CI loops), the `ms-app-deploy` sequence with RP rejection points, and the release/versioning flow, with diagrams.
+- [BYOB setup walkthrough](agent-skills/byob-setup.md) — step-by-step guide to standing up a BYOB deploy pipeline (service principal, per-environment permission grant, app creation, workflow wiring).
+- [Release guide](agent-skills/release-guide.md) — how to cut a release PR (version bump + changelog + dist rebuild).
 
 ## Prerequisites
 
