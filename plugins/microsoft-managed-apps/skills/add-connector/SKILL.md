@@ -82,8 +82,6 @@ When user intent is about **knowledge retrieval / grounded Microsoft 365 search 
 - `api-id`: `shared_a365copilotchatmcp`
 - `mode`: `action`
 
-Use workload-specific Work IQ connectors only when the user explicitly asks for that workload (mail/calendar/teams/word/user operations).
-
 #### 2b. Resolve `mode`
 
 For api-ids in the "Common Presets" table, use that table's mode. Otherwise ask the user one question, framed by what they want to do:

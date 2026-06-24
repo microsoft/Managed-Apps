@@ -21,4 +21,4 @@ Invoke `/add-connector` with:
 
 ## When to use
 
-Use this skill when the user asks for Work IQ knowledge/search/chat over Microsoft 365 content and does not explicitly require workload-specific tools (mail/calendar/teams/word/user).
+Use this skill when the user asks for Work IQ knowledge/search/chat over Microsoft 365 content.
