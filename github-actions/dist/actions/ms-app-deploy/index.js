@@ -19877,11 +19877,18 @@ async function main() {
     tenantId
   });
   const deployResult = await runDeploy(workingDirectory, cliEnv, { commitSha, artifactPath });
-  if (deployResult.id)
-    core.setOutput("app-id", deployResult.id);
-  if (deployResult.environmentId)
-    core.setOutput("environment-id", deployResult.environmentId);
-  core.info(`App '${deployResult.displayName ?? "(unknown)"}' deployed (id: ${deployResult.id ?? "unknown"}).`);
+  const deployedAppId = deployResult.appId ?? deployResult["id"];
+  if (deployedAppId)
+    core.setOutput("app-id", deployedAppId);
+  if (msConfig.environmentId)
+    core.setOutput("environment-id", msConfig.environmentId);
+  if (deployResult.commitHash)
+    core.setOutput("commit-sha", deployResult.commitHash);
+  if (deployResult.appPlayUri)
+    core.setOutput("app-play-uri", deployResult.appPlayUri);
+  core.info(`App '${deployResult.displayName ?? "(unknown)"}' deployed (id: ${deployedAppId ?? "unknown"}).`);
+  if (deployResult.appPlayUri)
+    core.info(`Play URL: ${deployResult.appPlayUri}`);
   core.endGroup();
 }
 async function runDeploy(cwd, env, opts) {
@@ -19960,15 +19967,49 @@ function parseJsonOutput(stdout, label) {
   if (!trimmed) {
     throw new Error(`${label} produced no JSON output.`);
   }
-  const match = trimmed.match(/\{[\s\S]*\}\s*$/);
-  const payload = match ? match[0] : trimmed;
-  try {
-    return JSON.parse(payload);
-  } catch (e) {
-    throw new Error(`Failed to parse ${label} JSON output: ${e instanceof Error ? e.message : e}
+  const objects = extractJsonObjects(trimmed);
+  for (let i = objects.length - 1; i >= 0; i--) {
+    try {
+      return JSON.parse(objects[i]);
+    } catch {
+    }
+  }
+  throw new Error(`Failed to parse ${label} JSON output (no valid JSON object found).
 Raw stdout:
 ${stdout}`);
+}
+function extractJsonObjects(s) {
+  const objects = [];
+  let depth = 0;
+  let start = -1;
+  let inString = false;
+  let escaped = false;
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+    if (inString) {
+      if (escaped)
+        escaped = false;
+      else if (ch === "\\")
+        escaped = true;
+      else if (ch === '"')
+        inString = false;
+      continue;
+    }
+    if (ch === '"') {
+      inString = true;
+    } else if (ch === "{") {
+      if (depth === 0)
+        start = i;
+      depth++;
+    } else if (ch === "}" && depth > 0) {
+      depth--;
+      if (depth === 0 && start >= 0) {
+        objects.push(s.slice(start, i + 1));
+        start = -1;
+      }
+    }
   }
+  return objects;
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

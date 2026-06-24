@@ -142,6 +142,9 @@ outputs:
   commit-sha:
     description: 'The commit SHA that was deployed.'
 
+  app-play-uri:
+    description: 'Play URL for the deployed app, parsed from `ms app deploy --json`.'
+
 runs:
   using: 'node24'
   main: '../dist/actions/ms-app-deploy/index.js'

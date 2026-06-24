@@ -54,10 +54,12 @@ interface MsConfig {
 }
 
 interface DeployResult {
-    id?: string;
+    success?: boolean;
+    appId?: string;
     displayName?: string;
-    environmentId?: string;
     commitHash?: string;
+    appPlayUri?: string;
+    repoType?: string;
     [key: string]: unknown;
 }
 
@@ -138,12 +140,19 @@ export async function main(): Promise<void> {
     });
 
     const deployResult = await runDeploy(workingDirectory, cliEnv, { commitSha, artifactPath });
-    if (deployResult.id) core.setOutput('app-id', deployResult.id);
-    if (deployResult.environmentId) core.setOutput('environment-id', deployResult.environmentId);
+
+    // The CLI returns `appId` (older builds used `id`); the environment id isn't
+    // in the deploy payload, so source it from ms.config.json.
+    const deployedAppId = deployResult.appId ?? (deployResult['id'] as string | undefined);
+    if (deployedAppId) core.setOutput('app-id', deployedAppId);
+    if (msConfig.environmentId) core.setOutput('environment-id', msConfig.environmentId);
+    if (deployResult.commitHash) core.setOutput('commit-sha', deployResult.commitHash);
+    if (deployResult.appPlayUri) core.setOutput('app-play-uri', deployResult.appPlayUri);
 
     core.info(
-        `App '${deployResult.displayName ?? '(unknown)'}' deployed (id: ${deployResult.id ?? 'unknown'}).`
+        `App '${deployResult.displayName ?? '(unknown)'}' deployed (id: ${deployedAppId ?? 'unknown'}).`
     );
+    if (deployResult.appPlayUri) core.info(`Play URL: ${deployResult.appPlayUri}`);
 
     core.endGroup();
 }
@@ -252,15 +261,55 @@ function parseJsonOutput<T>(stdout: string, label: string): T {
     if (!trimmed) {
         throw new Error(`${label} produced no JSON output.`);
     }
-    // The CLI may print log lines before the JSON. Take the last JSON object.
-    const match = trimmed.match(/\{[\s\S]*\}\s*$/);
-    const payload = match ? match[0] : trimmed;
-    try {
-        return JSON.parse(payload) as T;
-    } catch (e) {
-        throw new Error(
-            `Failed to parse ${label} JSON output: ${e instanceof Error ? e.message : e}\n` +
-            `Raw stdout:\n${stdout}`
-        );
+    // The CLI streams progress as NDJSON (one object per line, e.g.
+    // {"phase":"github-auth-pending"}) and prints the final result as a
+    // multi-line pretty-printed JSON object. Extract every top-level JSON
+    // object and return the last one that parses — that's the result. (A
+    // greedy first-{ to last-} match would splice all of them into one
+    // invalid blob.)
+    const objects = extractJsonObjects(trimmed);
+    for (let i = objects.length - 1; i >= 0; i--) {
+        try {
+            return JSON.parse(objects[i]) as T;
+        } catch {
+            // Not valid on its own — keep scanning earlier objects.
+        }
     }
+    throw new Error(
+        `Failed to parse ${label} JSON output (no valid JSON object found).\n` +
+        `Raw stdout:\n${stdout}`
+    );
+}
+
+// Splits a string into its top-level {...} JSON object substrings, tracking
+// string literals and escapes so braces inside string values don't unbalance
+// the scan.
+function extractJsonObjects(s: string): string[] {
+    const objects: string[] = [];
+    let depth = 0;
+    let start = -1;
+    let inString = false;
+    let escaped = false;
+    for (let i = 0; i < s.length; i++) {
+        const ch = s[i];
+        if (inString) {
+            if (escaped) escaped = false;
+            else if (ch === '\\') escaped = true;
+            else if (ch === '"') inString = false;
+            continue;
+        }
+        if (ch === '"') {
+            inString = true;
+        } else if (ch === '{') {
+            if (depth === 0) start = i;
+            depth++;
+        } else if (ch === '}' && depth > 0) {
+            depth--;
+            if (depth === 0 && start >= 0) {
+                objects.push(s.slice(start, i + 1));
+                start = -1;
+            }
+        }
+    }
+    return objects;
 }

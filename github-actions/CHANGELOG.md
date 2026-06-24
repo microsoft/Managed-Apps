@@ -21,6 +21,14 @@ Initial release of the Managed Apps GitHub Actions.
 - `ms-app-pack` — runs `ms app pack` to build the app and stage the packed artifact.
 - `ms-app-deploy` — runs `ms app deploy` with `--artifact`, `--commit`, or
   CLI-internal pack modes, selected from `repoType` in `ms.config.json`.
+  Outputs `app-id`, `environment-id`, `commit-sha`, and `app-play-uri`.
+
+### Fixed
+- `ms-app-deploy` now parses the CLI's streamed `--json` output correctly — the
+  CLI emits NDJSON progress lines followed by a multi-line result object, which
+  the previous greedy parse spliced into one invalid blob and failed on. It now
+  extracts the last valid JSON object, and reads `appId` (the CLI's field name)
+  plus sources `environment-id` from `ms.config.json`.
 
 ### Notes
 - Actions run on the `node24` runtime; esbuild bundles target `node24`.
