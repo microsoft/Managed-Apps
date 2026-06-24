@@ -156,23 +156,11 @@ const result = await Office365OutlookService.SendEmailV2({
 - `messageId` (string) — Email ID to reply to
 - `body` (string) — Reply text
 
-## Response Pattern (All Methods)
-
-All Office 365 methods return `IOperationResult<T>`:
-
-```typescript
-const result = await Office365OutlookService.SomeMethod(...)
-
-if (!result.success) {
-  throw new Error(result.error?.message ?? 'Operation failed')
-}
-
-const data = result.data  // Safe to access
-```
-
 ---
 
 ## Key Patterns
+
+**📋 Generic connector response handling:** [shared-instructions.md](${CLAUDE_PLUGIN_ROOT}/shared/shared-instructions.md#connector-response-handling) — Error handling, array access (`.data.value`), empty results, and response structure patterns apply to all connectors, including Office 365.
 
 **1. Always discover calendar ID first using `CalendarGetTables()`**
 
@@ -182,21 +170,7 @@ This ensures you have the correct calendar ID for the user (don't hardcode "Cale
 
 Use `.toISOString()` when passing dates to Office 365 methods.
 
-**3. Access array results via `.data.value`**
-
-List operations return wrapped responses — the actual array is in `data.value`.
-
-**4. Handle empty results as valid state**
-
-Empty array (no emails/events) is a valid result, not an error. Show empty state to user.
-
-**5. Surface errors by throwing**
-
-When API fails, throw an error so it bubbles up to component error handling. Don't silently use mock data.
-
----
-
-## Calendar ID Discovery - CRITICAL
+**3. Calendar ID Discovery - CRITICAL**
 
 **⚠️ NEVER use hardcoded `'Calendar'` as calendar ID.** Always discover from the user's actual calendars.
 

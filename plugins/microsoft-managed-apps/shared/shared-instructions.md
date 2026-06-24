@@ -124,6 +124,72 @@ Microsoft Apps run inside a sandbox. Direct HTTP calls to external APIs will fai
 
 ---
 
+## Connector Response Handling
+
+All generated connector services return `IOperationResult<T>`, a common wrapper across all connectors. Use these patterns consistently:
+
+### Response Structure
+
+```typescript
+const result = await SomeConnectorService.SomeMethod(...)
+
+if (!result.success) {
+  throw new Error(result.error?.message ?? 'Operation failed')
+}
+
+const data = result.data  // Safe to access after success check
+```
+
+### Array Results: Access via `.data.value`
+
+List operations return wrapped responses — the actual array is in `data.value`:
+
+```typescript
+// ✅ CORRECT
+const items = result.data?.value ?? []
+
+// ❌ WRONG - will be undefined
+const items = result.data
+```
+
+**Why:** The HTTP client wrapper places array results inside a `value` property for standardization across all connectors.
+
+### Error Handling: Always Throw
+
+When an API call fails, throw an error so it bubbles up to component error handling:
+
+```typescript
+if (!result.success) {
+  throw new Error(result.error?.message ?? 'Operation failed')
+}
+
+// ❌ WRONG - silent fallbacks hide real failures
+if (!result.success) {
+  return []  // or mockData, or undefined
+}
+```
+
+**Why:** Silent fallbacks (mock data, empty arrays, null checks) mask real failures and make debugging impossible. Errors surface immediately so you know what broke and why.
+
+### Empty Results Are Valid
+
+An empty array (no items found) is a **valid result**, not an error. Treat it as normal state:
+
+```typescript
+const items = result.data?.value ?? []
+
+if (items.length === 0) {
+  // Show empty state to user, don't throw
+  return <EmptyStateComponent />
+}
+```
+
+**Distinction:**
+- **Valid but empty** (length === 0) → show UI empty state
+- **API failed** (success === false) → throw error
+
+---
+
 ## CLI Toolchain
 
 The CLI is `@microsoft/managed-apps-cli` (binary `ms`), installed globally from the public npm registry. The `/create-app` skill handles install + binary-name probing.
