@@ -27,9 +27,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with: { node-version: '22' }
+    - uses: actions/checkout@v5
+    - uses: actions/setup-node@v5
+      with: { node-version: '24' }
     - run: npm install
       working-directory: apps/my-app
     - uses: microsoft/Managed-Apps/github-actions/install-ms-cli@v1

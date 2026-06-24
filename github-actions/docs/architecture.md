@@ -38,7 +38,7 @@ flowchart TD
     end
 
     subgraph CI["CI/CD loop (GitHub Actions)"]
-        C1["actions/checkout"] --> C2["actions/setup-node@24"]
+        C1["actions/checkout@v5"] --> C2["actions/setup-node@v5<br/>(node 24)"]
         C2 --> C3["npm install (app dir)"]
         C3 --> C4["install-ms-cli"]
         C4 --> C5["ms-app-deploy"]
