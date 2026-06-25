@@ -86,11 +86,12 @@ Full flag reference:
 
 ### Step 5: Surface URL
 
-Present the URL the CLI printed. For live mode, surface the CLI's built-in warning:
+Present the URL the CLI printed as a markdown link on a single line (`[label](<url>)`). Never print a bare URL.
+
+For live mode, surface the CLI's built-in warning:
 
 ```
-Live URL for 'my-app':
-  https://apps.powerapps.com/play/e/<env-id>/app/<guid>
+Live URL for 'my-app': [Open live app](<https://play.managedapps.cloud.microsoft/appframework/e/ENV_ID/app/APP_ID>)
 
 ⚠ Live does not auto-update. Run /deploy to publish new code to the live URL.
 ```
@@ -98,15 +99,13 @@ Live URL for 'my-app':
 For preview:
 
 ```
-Preview URL for 'my-app' (main):
-  https://apps.powerapps.com/play/e/<env-id>/app/<guid>/branch/main
+Preview URL for 'my-app' (main): [Open preview](<https://play.managedapps.cloud.microsoft/appframework/e/ENV_ID/app/APP_ID/branch/main>)
 ```
 
 For commit-pinned preview:
 
 ```
-Preview URL for 'my-app' (commit abc1234):
-  https://apps.powerapps.com/play/e/<env-id>/app/<guid>/commit/abc1234
+Preview URL for 'my-app' (commit abc1234): [Open preview at abc1234](<https://play.managedapps.cloud.microsoft/appframework/e/ENV_ID/app/APP_ID/commit/abc1234>)
 ```
 
 ---

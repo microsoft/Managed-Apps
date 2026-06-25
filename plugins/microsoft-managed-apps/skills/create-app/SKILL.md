@@ -240,7 +240,7 @@ If `npm run build` fails, fix the errors before running `ms app dev`. Don't hand
 `ms app dev` runs two servers and prints an App Player URL like:
 
 ```
-Ready. You can play your app locally at: https://apps.powerapps.com/play/e/<env-id>/app/<app-id>?...
+Ready. You can play your app locally at: https://play.managedapps.cloud.microsoft/apps/dev?ms_appUrl=...&ms_appConfigUrl=...
 ```
 
 Hand that URL to the user **as a markdown link** (`[Open app in browser](<url>)`). The raw URL is long enough to be truncated by most terminals; markdown link form keeps it clickable and copyable. **Nothing has been deployed to the cloud at this point** — the app exists in the service catalog but its runtime is local, with the connectors and UI you just built wired up.
@@ -308,7 +308,7 @@ ms app create \
 npm install
 npm run build
 ms app dev
-# → Ready. Play locally at: https://apps.powerapps.com/play/e/<env-id>/app/7ea6...
+# → Ready. Play locally at: https://play.managedapps.cloud.microsoft/apps/dev?ms_appUrl=...
 ```
 
 **Final summary (verbatim format):**
@@ -322,7 +322,7 @@ Environment: Default-<guid> (auto-routed Developer environment)
 Cluster: prod
 Project: /Users/alice/work/sample_one
 Remote: https://<env-id>.d.environment.api.powerplatform.com/...
-Local URL: [Open app in browser](https://apps.powerapps.com/play/e/<env-id>/app/7ea6...?...)
+Local URL: [Open app in browser](https://play.managedapps.cloud.microsoft/apps/dev?...)
 
 Nothing has been deployed to the cloud. The app (with its connectors and UI
 already wired up) runs from your machine via `ms app dev`. The browser tab

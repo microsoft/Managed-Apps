@@ -26,7 +26,7 @@ ms app show --json | jq -r '.environment.url'
 
 (Field name may vary by CLI version — inspect the full envelope first if `.environment.url` doesn't resolve.)
 
-**From the maker portal**: open `https://make.powerapps.com`, switch to the target environment, and read the URL from Settings → Developer resources → Environment URL.
+**From the Power Platform admin center**: open `https://admin.powerplatform.microsoft.com`, select the target environment, and read the Environment URL from its details.
 
 Capture as `$ENV_URL`.
 

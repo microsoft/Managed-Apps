@@ -72,7 +72,7 @@ Match the substring `Authentication failed for 'https://` followed by `.d.enviro
 | `npm run build` fails with TS6133 (unused import)                    | Remove the unused import and retry once.                                                                 |
 | `npm run build` fails with module-not-found                          | Run `npm install` and retry.                                                                             |
 | `ms app dev` exits immediately with port-in-use                      | Pass `--port <other>` or kill whatever's on 8080.                                                        |
-| `ms app dev` connector calls return 401/403 in the browser           | Maker-portal session expired. Sign in again at `https://make.powerapps.com`, then refresh the App Player tab. |
+| `ms app dev` connector calls return 401/403 in the browser           | Auth session expired. Re-authenticate with `ms auth login` (check with `ms auth status`), then refresh the App Player tab. |
 | Binary "command not found" after `npm install -g`                    | `npm config get prefix` directory's `bin` isn't on PATH. On Windows, default is `%APPDATA%\npm` — usually added by the Node installer, but a manual install or PowerShell-profile override can break this. |
 | `npx ms ...` resolves to an unrelated package                        | Don't use `npx ms`; use the globally-installed binary directly. The public-registry `ms` is a date-parser shim. |
 
